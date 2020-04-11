@@ -331,6 +331,8 @@ function AlienTeam:AddGorgeStructure(player, structure)
 
         table.insertunique(structureTypeTable[techId], structureId)
 
+        ApplyGorgeStructureTheme(structure, player)
+
         local numAllowedStructure = LookupTechData(techId, kTechDataMaxAmount, -1) --* self:GetNumHives()
 
         if numAllowedStructure >= 0 and #structureTypeTable[techId] > numAllowedStructure then
@@ -968,6 +970,7 @@ function AlienTeam:InitTechTree()
     self.techTree:AddResearchNode(kTechId.Stomp,             kTechId.BioMassEight, kTechId.None, kTechId.AllAliens)
 
     -- gorge structures
+    self.techTree:AddBuildNode(kTechId.GorgeTunnel)
     self.techTree:AddBuildNode(kTechId.Hydra)
     self.techTree:AddBuildNode(kTechId.Clog)
 

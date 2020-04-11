@@ -434,14 +434,13 @@ end
 
 -- #######################################################
 
--- Todo: refactor this mess
 local function BuildCommanderHelpFunctions()
 
     gGetMarineCommanderHelp = {}
     gGetAlienCommanderHelp = {}
-
+    
     -- marine help functions
-
+    
     table.insert(gGetMarineCommanderHelp, {kTechId.Extractor, GetExtractorIndicators} )
     table.insert(gGetMarineCommanderHelp, {kTechId.InfantryPortal, GetBaseStructureHelpFunction(kTechId.InfantryPortal)} )
     table.insert(gGetMarineCommanderHelp, {kTechId.Armory, GetBaseStructureHelpFunction(kTechId.Armory)} )
@@ -453,7 +452,7 @@ local function BuildCommanderHelpFunctions()
     table.insert(gGetMarineCommanderHelp, {kTechId.ArmsLab, GetBaseStructureHelpFunction(kTechId.ArmsLab)} )
     table.insert(gGetMarineCommanderHelp, {kTechId.PrototypeLab, GetBaseStructureHelpFunction(kTechId.PrototypeLab)} )
     table.insert(gGetMarineCommanderHelp, {kTechId.AdvancedArmoryUpgrade, GetUpgradeHelpFunction("Armory", kTechId.AdvancedArmoryUpgrade, kTechId.AdvancedArmory, kWorldButtonSize * .5)} )
-
+    
     table.insert(gGetMarineCommanderHelp, {kTechId.Weapons1, GetResearchHelpFunction("ArmsLab", kTechId.Weapons1, -kWorldButtonSize * .5) })
     table.insert(gGetMarineCommanderHelp, {kTechId.Weapons2, GetResearchHelpFunction("ArmsLab", kTechId.Weapons2, -kWorldButtonSize * .5) })
     table.insert(gGetMarineCommanderHelp, {kTechId.Weapons3, GetResearchHelpFunction("ArmsLab", kTechId.Weapons3, -kWorldButtonSize * .5) })
@@ -467,16 +466,16 @@ local function BuildCommanderHelpFunctions()
 
     table.insert(gGetMarineCommanderHelp, {kTechId.MedPack, GetMedpackHelpFunction})
     table.insert(gGetMarineCommanderHelp, {kTechId.AmmoPack, GetAmmoHelpFunction})
-
+    
     table.insert(gGetMarineCommanderHelp, {kTechId.CommandStation, GetCommandStationHint})
-
+    
     -- alien help functions
-
+  
     table.insert(gGetAlienCommanderHelp, {kTechId.Harvester, GetHarvesterIndicators} )
     table.insert(gGetAlienCommanderHelp, {kTechId.UpgradeToCragHive, GetUpgradeHelpFunction("Hive", kTechId.UpgradeToCragHive, kTechId.CragHive, -kWorldButtonSize)} )
     table.insert(gGetAlienCommanderHelp, {kTechId.UpgradeToShiftHive, GetUpgradeHelpFunction("Hive", kTechId.UpgradeToShiftHive, kTechId.ShiftHive, 0)} )
     table.insert(gGetAlienCommanderHelp, {kTechId.UpgradeToShadeHive, GetUpgradeHelpFunction("Hive", kTechId.UpgradeToShadeHive, kTechId.ShadeHive, kWorldButtonSize)} )
-
+    
     table.insert(gGetAlienCommanderHelp, {kTechId.Shell, GetBaseStructureHelpFunction(kTechId.Shell)} )
     table.insert(gGetAlienCommanderHelp, {kTechId.Spur, GetBaseStructureHelpFunction(kTechId.Spur)} )
     table.insert(gGetAlienCommanderHelp, {kTechId.Veil, GetBaseStructureHelpFunction(kTechId.Veil)} )
@@ -484,15 +483,16 @@ local function BuildCommanderHelpFunctions()
     table.insert(gGetAlienCommanderHelp, {kTechId.BileBomb, GetResearchHelpFunction("Crag", kTechId.BileBomb, -kWorldButtonSize)} )
     table.insert(gGetAlienCommanderHelp, {kTechId.Umbra, GetResearchHelpFunction("Crag", kTechId.Umbra, 0)} )
     table.insert(gGetAlienCommanderHelp, {kTechId.Stomp, GetResearchHelpFunction("Crag", kTechId.Stomp, kWorldButtonSize)} )
-
+    
+    table.insert(gGetAlienCommanderHelp, {kTechId.GorgeTunnelTech, GetResearchHelpFunction("Shift", kTechId.GorgeTunnelTech, -kWorldButtonSize)} )
     table.insert(gGetAlienCommanderHelp, {kTechId.Leap, GetResearchHelpFunction("Shift", kTechId.Leap, 0)} )
     table.insert(gGetAlienCommanderHelp, {kTechId.Xenocide, GetResearchHelpFunction("Shift", kTechId.Xenocide, kWorldButtonSize)} )
-
+    
     table.insert(gGetAlienCommanderHelp, {kTechId.ShadowStep, GetResearchHelpFunction("Shade", kTechId.ShadowStep, -kWorldButtonSize)} )
     table.insert(gGetAlienCommanderHelp, {kTechId.Spores, GetResearchHelpFunction("Shade", kTechId.Spores, kWorldButtonSize)} )
-
+    
     table.insert(gGetAlienCommanderHelp, {kTechId.Cyst, GetCystHelpFunction})
-
+    
     table.insert(gGetAlienCommanderHelp, {kTechId.Hive, GetHiveHint})
 
 end

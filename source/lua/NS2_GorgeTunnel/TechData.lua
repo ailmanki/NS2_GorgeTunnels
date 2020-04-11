@@ -2965,8 +2965,37 @@ function BuildTechData()
             [kTechDataPointValue] = kClogPointValue,
         },
 
-        -- Tunnel tech
+        {
+            [kTechDataId] = kTechId.GorgeTunnel,
+            [kTechDataCategory] = kTechId.Gorge,
+            [kTechDataMaxExtents] = Vector(1.2, 1.2, 1.2),
+            [kTechDataTooltipInfo] = "GORGE_TUNNEL_TOOLTIP",
+            [kTechDataGhostModelClass] = "AlienGhostModel",
+            [kTechDataAllowConsumeDrop] = true,
+            [kTechDataAllowStacking] = false,
+            [kTechDataMaxAmount] = kNumGorgeTunnels,
+            [kTechDataMapName] = TunnelEntrance.kMapName,
+            [kTechDataDisplayName] = "TUNNEL_ENTRANCE",
+            [kTechDataHint] = "TUNNEL_ENTRANCE_HINT",
+            [kTechDataCostKey] = kGorgeTunnelCost,
+            [kTechDataMaxHealth] = kTunnelEntranceHealth,
+            [kTechDataMaxArmor] = kTunnelEntranceArmor,
+            [kTechDataBuildTime] = kGorgeTunnelBuildTime,
+            [kTechDataModel] = TunnelEntrance.kModelName,
+            [kTechDataRequiresInfestation] = false,
+            [kTechDataPointValue] = kTunnelEntrancePointValue,
+        },
 
+        {
+            [kTechDataId] = kTechId.GorgeTunnelTech,
+            [kTechDataDisplayName] = "GORGE_TUNNEL_TECH",
+            [kTechDataTooltipInfo] = "GORGE_TUNNEL_TECH_TOOLTIP",
+            [kTechDataCostKey] = kGorgeTunnelResearchCost,
+            [kTechDataResearchTimeKey] = kGorgeTunnelResearchTime,
+        },
+        
+        -- Tunnel tech
+        
         -- Initial tunnel entrance placement for a new tunnel.
         {
             [kTechDataId] = kTechId.Tunnel,

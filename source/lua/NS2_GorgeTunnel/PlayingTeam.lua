@@ -152,7 +152,7 @@ function PlayingTeam:ResetTeam()
 
     local initialTechPoint = self:GetInitialTechPoint()
     
-    local _, commandStructure = self:SpawnInitialStructures(initialTechPoint)
+    local tower, commandStructure = self:SpawnInitialStructures(initialTechPoint)
     
     self.conceded = false
     
@@ -185,7 +185,7 @@ function PlayingTeam:GetActiveTeamSkin()
     return nil
 end
 
-function PlayingTeam:SetStructureSkinIndex()
+function PlayingTeam:SetStructureSkinIndex(data)
 end
 
 function PlayingTeam:GetNumCapturedTechPoints()
@@ -271,7 +271,7 @@ local relevantResearchIds
 local function GetIsResearchRelevant(techId)
 
     if not relevantResearchIds then
-
+    
         relevantResearchIds = {}
         relevantResearchIds[kTechId.GrenadeLauncherTech] = 2
         relevantResearchIds[kTechId.AdvancedWeaponry] = 2
@@ -286,38 +286,38 @@ local function GetIsResearchRelevant(techId)
         relevantResearchIds[kTechId.DualMinigunTech] = 3
         relevantResearchIds[kTechId.ClawRailgunTech] = 3
         relevantResearchIds[kTechId.DualRailgunTech] = 3
-
+        
         relevantResearchIds[kTechId.DetonationTimeTech] = 2
-
+        
         relevantResearchIds[kTechId.Armor1] = 1
         relevantResearchIds[kTechId.Armor2] = 1
         relevantResearchIds[kTechId.Armor3] = 1
-
+        
         relevantResearchIds[kTechId.Weapons1] = 1
         relevantResearchIds[kTechId.Weapons2] = 1
         relevantResearchIds[kTechId.Weapons3] = 1
-
+        
         relevantResearchIds[kTechId.UpgradeSkulk] = 1
         relevantResearchIds[kTechId.UpgradeGorge] = 1
         relevantResearchIds[kTechId.UpgradeLerk] = 1
         relevantResearchIds[kTechId.UpgradeFade] = 1
         relevantResearchIds[kTechId.UpgradeOnos] = 1
-
-        --relevantResearchIds[kTechId.GorgeTunnelTech] = 1
-
+        
+        relevantResearchIds[kTechId.GorgeTunnelTech] = 1
+        
         relevantResearchIds[kTechId.Leap] = 1
         relevantResearchIds[kTechId.BileBomb] = 1
         relevantResearchIds[kTechId.Spores] = 1
         relevantResearchIds[kTechId.Stab] = 1
         relevantResearchIds[kTechId.Stomp] = 1
-
+        
         relevantResearchIds[kTechId.Xenocide] = 1
         relevantResearchIds[kTechId.Umbra] = 1
         relevantResearchIds[kTechId.BoneShield] = 1
         relevantResearchIds[kTechId.WebTech] = 1
-
+    
     end
-
+    
     return relevantResearchIds[techId]
 
 end
@@ -329,26 +329,26 @@ function PlayingTeam:OnResearchComplete(structure, researchId)
     for _, ent in ipairs(teamEnts) do
         ent:TechResearched(structure, researchId)
     end
-
+    
     if structure then
-
+    
         local techNode = self:GetTechTree():GetTechNode(researchId)
-
+        
         if techNode and (techNode:GetIsEnergyManufacture() or techNode:GetIsManufacture() or techNode:GetIsPlasmaManufacture()) then
-            self:TriggerAlert(ConditionalValue(self:GetTeamType() == kMarineTeamType, kTechId.MarineAlertManufactureComplete, kTechId.AlienAlertManufactureComplete), structure)
+            self:TriggerAlert(ConditionalValue(self:GetTeamType() == kMarineTeamType, kTechId.MarineAlertManufactureComplete, kTechId.AlienAlertManufactureComplete), structure)  
         else
             self:TriggerAlert(ConditionalValue(self:GetTeamType() == kMarineTeamType, kTechId.MarineAlertResearchComplete, kTechId.AlienAlertResearchComplete), structure)
         end
-
+        
     end
-
+    
     -- pass relevant techIds to team info object
     local techPriority = GetIsResearchRelevant(researchId)
     if techPriority ~= nil then
-
+    
         local teamInfoEntity = Shared.GetEntity(self.teamInfoEntityId)
-        teamInfoEntity:SetLatestResearchedTech(researchId, Shared.GetTime() + PlayingTeam.kResearchDisplayTime, techPriority)
-
+        teamInfoEntity:SetLatestResearchedTech(researchId, Shared.GetTime() + PlayingTeam.kResearchDisplayTime, techPriority) 
+        
     end
 
     -- inform listeners
@@ -356,7 +356,7 @@ function PlayingTeam:OnResearchComplete(structure, researchId)
     local listeners = self.eventListeners['OnResearchComplete']
 
     if listeners then
-
+    
         for _, listener in ipairs(listeners) do
             listener(structure, researchId)
         end
@@ -803,7 +803,7 @@ function PlayingTeam:RespawnAllDeadPlayer()
     end
 end
 
-function PlayingTeam:Update()
+function PlayingTeam:Update(timePassed)
 
     PROFILE("PlayingTeam:Update")
     

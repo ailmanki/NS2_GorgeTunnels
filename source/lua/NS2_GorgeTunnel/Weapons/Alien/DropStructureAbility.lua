@@ -9,6 +9,7 @@
 Script.Load("lua/Weapons/Alien/Ability.lua")
 Script.Load("lua/Weapons/Alien/HydraAbility.lua")
 Script.Load("lua/Weapons/Alien/ClogAbility.lua")
+Script.Load("lua/NS2_GorgeTunnel/Weapons/Alien/GorgeTunnelAbility.lua")
 Script.Load("lua/Weapons/Alien/WebsAbility.lua")
 Script.Load("lua/Weapons/Alien/BabblerEggAbility.lua")
 
@@ -22,13 +23,14 @@ DropStructureAbility.kMapName = "drop_structure_ability"
 PrecacheAsset("sound/NS2.fev/alien/gorge/create_fail")
 local kAnimationGraph = PrecacheAsset("models/alien/gorge/gorge_view.animation_graph")
 
-DropStructureAbility.kSupportedStructures = { HydraStructureAbility, ClogAbility, WebsAbility, BabblerEggAbility }
+DropStructureAbility.kSupportedStructures = { HydraStructureAbility, ClogAbility, WebsAbility, GorgeTunnelAbility, BabblerEggAbility }
 
 local networkVars =
 {
     numHydrasLeft = string.format("private integer (0 to %d)", kMaxStructuresPerType),
     numWebsLeft = string.format("private integer (0 to %d)", kMaxStructuresPerType),
     numClogsLeft = string.format("private integer (0 to %d)", kMaxStructuresPerType),
+    numTunnelsLeft = string.format("private integer (0 to %d)", kMaxStructuresPerType),
     numBabblersLeft = string.format("private integer (0 to %d)", kMaxStructuresPerType),
 }
 
@@ -58,6 +60,7 @@ function DropStructureAbility:OnCreate()
     self.numHydrasLeft = 0
     self.numWebsLeft = 0
     self.numClogsLeft = 0
+    self.numTunnelsLeft = 0
     self.numBabblersLeft = 0
     self.lastClickedPosition = nil
 
@@ -91,7 +94,11 @@ function DropStructureAbility:GetNumStructuresBuilt(techId)
     if techId == kTechId.Clog then
         return self.numClogsLeft
     end
-
+    
+    if techId == kTechId.GorgeTunnel then
+        return self.numTunnelsLeft
+    end
+    
     if techId == kTechId.Web then
         return self.numWebsLeft
     end
@@ -290,7 +297,9 @@ function DropStructureAbility:DropStructure(player, origin, direction, structure
                         angles.yaw = math.random() * math.pi * 2
                         angles.pitch = math.random() * math.pi * 2
                         angles.roll = math.random() * math.pi * 2
-
+                        
+                    elseif structure:isa("TunnelEntrance") then
+                        angles:BuildFromCoords(coords)
                     else
                         angles:BuildFromCoords(coords)
                     end
@@ -524,6 +533,7 @@ function DropStructureAbility:ProcessMoveOnWeapon(input)
             local team = player:GetTeam()
             local numAllowedHydras = LookupTechData(kTechId.Hydra, kTechDataMaxAmount, -1)
             local numAllowedClogs = LookupTechData(kTechId.Clog, kTechDataMaxAmount, -1)
+            local numAllowedTunnels = LookupTechData(kTechId.GorgeTunnel, kTechDataMaxAmount, -1)
             local numAllowedWebs = LookupTechData(kTechId.Web, kTechDataMaxAmount, -1)
             local numAllowedBabblers = LookupTechData(kTechId.BabblerEgg, kTechDataMaxAmount, -1)
 
@@ -534,7 +544,11 @@ function DropStructureAbility:ProcessMoveOnWeapon(input)
             if numAllowedClogs >= 0 then
                 self.numClogsLeft = team:GetNumDroppedGorgeStructures(player, kTechId.Clog)
             end
-
+            
+            if numAllowedTunnels >= 0 then
+                self.numTunnelsLeft = team:GetNumDroppedGorgeStructures(player, kTechId.GorgeTunnel)
+            end
+            
             if numAllowedWebs >= 0 then
                 self.numWebsLeft = team:GetNumDroppedGorgeStructures(player, kTechId.Web)
             end

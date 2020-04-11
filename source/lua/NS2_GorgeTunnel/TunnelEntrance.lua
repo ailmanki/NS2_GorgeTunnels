@@ -44,6 +44,8 @@ class 'TunnelEntrance' (ScriptActor)
 
 TunnelEntrance.kMapName = "tunnelentrance"
 
+local kTunnelInfestationRadius = 7
+
 TunnelEntrance.kModelName = PrecacheAsset("models/alien/tunnel/mouth.model")
 TunnelEntrance.kModelNameShadow = PrecacheAsset("models/alien/tunnel/mouth_shadow.model")
 local kAnimationGraph = PrecacheAsset("models/alien/tunnel/mouth.animation_graph")
@@ -64,12 +66,13 @@ local networkVars =
     open = "boolean",
     beingUsed = "boolean",
     timeLastExited = "time",
+    ownerId = "entityid",
     destLocationId = "entityid",
     clogNearMouth = "boolean",
     skipOpenAnimation = "boolean",
     --timeResearchStarted is used to synchronize the two sides of the tunnels and their research state.
     timeResearchStarted = "time",
-    --variant = "enum kAlienTunnelVariants"
+    variant = "enum kGorgeVariant"
 }
 
 AddMixinNetworkVars(BaseModelMixin, networkVars)
@@ -142,13 +145,16 @@ function TunnelEntrance:OnCreate()
     self.otherEntranceId = Entity.invalidId
     self.clogNearMouth = false
     self.timeResearchStarted = 0
+    self.variant = kGorgeVariant.normal
     
 end
 
 function TunnelEntrance:OnInitialized()
 
     ScriptActor.OnInitialized(self)
-
+    
+    self:SetModel(TunnelEntrance.kModelName, kAnimationGraph)
+    
     if Server then
     
         InitMixin(self, StaticTargetMixin)
@@ -250,6 +256,8 @@ function TunnelEntrance:SetVariant(tunnelVariant)
     else
         self:SetModel(TunnelEntrance.kModelName, kAnimationGraph)
     end
+
+    self.variant = tunnelVariant
     
 end
 
@@ -274,6 +282,45 @@ function TunnelEntrance:GetStartingHealthScalar()
     return kTunnelStartingHealthScalar
 end
 
+if not Server then
+    function TunnelEntrance:GetOwner()
+        return self.ownerId ~= nil and Shared.GetEntity(self.ownerId)
+    end
+end
+
+function TunnelEntrance:GetOwnerClientId()
+    return self.ownerClientId
+end
+
+function TunnelEntrance:GetDigestDuration()
+    return kDigestDuration
+end
+
+function TunnelEntrance:GetCanDigest(player)
+    return player == self:GetOwner() and player:isa("Gorge") and (not HasMixin(self, "Live") or self:GetIsAlive()) --and self:GetIsBuilt()
+end
+
+function TunnelEntrance:SetOwner(owner)
+
+    if owner and not self.ownerClientId then
+    
+        local client = Server.GetOwner(owner)
+        self.ownerClientId = client:GetUserId()
+
+        if Server then
+            self:UpdateConnectedTunnel()
+        end
+    
+        if self.tunnelId and self.tunnelId ~= Entity.invalidId then
+        
+            local tunnelEnt = Shared.GetEntity(self.tunnelId)
+            tunnelEnt:SetOwnerClientId(self.ownerClientId)
+        
+        end
+
+    end
+    
+end
 function TunnelEntrance:GetCanAutoBuild()
     return self:GetGameEffectMask(kGameEffect.OnInfestation)
 end
@@ -581,6 +628,52 @@ if Server then
         return false
     end
     
+    function TunnelEntrance:GetTunnelEntity()
+        
+        if self.tunnelId and self.tunnelId ~= Entity.invalidId then
+            return Shared.GetEntity(self.tunnelId)
+        end
+    
+    end
+    
+    function TunnelEntrance:UpdateConnectedTunnel()
+        
+        local hasValidTunnel = self.tunnelId ~= nil and Shared.GetEntity(self.tunnelId) ~= nil
+        
+        if hasValidTunnel or self:GetOwnerClientId() == nil or not self:GetIsBuilt() then
+            return
+        end
+        
+        local foundTunnel
+        
+        -- register if a tunnel entity already exists or a free tunnel has been found
+        for index, tunnel in ientitylist( Shared.GetEntitiesWithClassname("Tunnel") ) do
+            
+            if tunnel:GetOwnerClientId() == self:GetOwnerClientId() then
+                
+                foundTunnel = tunnel
+                break
+            
+            elseif not foundTunnel and not tunnel:GetOwnerClientId() then
+                
+                foundTunnel = tunnel
+            
+            end
+        
+        end
+        
+        if not foundTunnel then
+            -- no tunnel entity present
+            foundTunnel = CreateEntity(Tunnel.kMapName, nil, self:GetTeamNumber())
+        end
+        
+        -- check if there is another tunnel entrance to connect with
+        foundTunnel:SetOwnerClientId(self:GetOwnerClientId())
+        foundTunnel:AddExit(self)
+        self.tunnelId = foundTunnel:GetId()
+    
+    end
+    
     -- Sets the Tunnel entity that this TunnelEntrance leads to.  Also handles informing the Tunnel entity.
     function TunnelEntrance:SetTunnel(tunnel)
         
@@ -836,6 +929,14 @@ function TunnelEntrance:OnUpdateRender()
         self.decal = nil
     end
 
+   -- if self._renderModel then
+   --     if self.variant == kGorgeVariant.toxin then
+   --         self._renderModel:SetMaterialParameter("textureIndex", 1 )
+   --     else
+   --        self._renderModel:SetMaterialParameter("textureIndex", 0 )
+   --     end
+   -- end
+
 end
 
 
@@ -846,6 +947,35 @@ function TunnelEntrance:GetDestinationLocationName()
         return location:GetName()
     end
     
+end
+
+
+function TunnelEntrance:GetUnitNameOverride(viewer)
+
+    local unitName = GetDisplayName(self)    
+    
+    if not GetAreEnemies(self, viewer) and self.ownerId then
+        local ownerName
+        for _, playerInfo in ientitylist(Shared.GetEntitiesWithClassname("PlayerInfoEntity")) do
+            if playerInfo.playerId == self.ownerId then
+                ownerName = playerInfo.playerName
+                break
+            end
+        end
+        if ownerName then
+            
+            local lastLetter = ownerName:sub(-1)
+            if lastLetter == "s" or lastLetter == "S" then
+                return string.format( Locale.ResolveString( "TUNNEL_ENTRANCE_OWNER_ENDS_WITH_S" ), ownerName )
+            else
+                return string.format( Locale.ResolveString( "TUNNEL_ENTRANCE_OWNER" ), ownerName )
+            end
+        end
+        
+    end
+
+    return unitName
+
 end
 
 function TunnelEntrance:OverrideHintString( hintString, forEntity )

@@ -213,6 +213,8 @@ kTechIdToMaterialOffset[kTechId.DropHeavyMachineGun] = 171
 kTechIdToMaterialOffset[kTechId.Aura] = 113
 kTechIdToMaterialOffset[kTechId.Leap] = 67
 kTechIdToMaterialOffset[kTechId.BileBomb] = 68
+kTechIdToMaterialOffset[kTechId.GorgeTunnel] = 103
+kTechIdToMaterialOffset[kTechId.GorgeTunnelTech] = 103
 
 -- Todo: Add new icons for new tunnel tech ids
 kTechIdToMaterialOffset[kTechId.Tunnel] = 179

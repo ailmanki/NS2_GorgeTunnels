@@ -17,6 +17,7 @@ Script.Load("lua/MinimapConnectionMixin.lua")
 
 kTunnelExitSide = enum({'A', 'B'})
 
+dbgTunnelOptOn = true
 -- So tunnels don't ever overlap in world-space, keep track of which "slots" have tunnels in them.
 local tunnelSlots = {}
 function GetNextAvailableTunnelSlot() -- reserves and returns the next available "tunnel slot" index.
@@ -33,6 +34,7 @@ function FreeTunnelSlot(index)
     assert(tunnelSlots[index] == true)
     tunnelSlots[index] = nil
 end
+
 
 class 'Tunnel' (Entity)
 
@@ -112,6 +114,18 @@ AddMixinNetworkVars(BaseModelMixin, networkVars)
 AddMixinNetworkVars(ModelMixin, networkVars)
 AddMixinNetworkVars(TeamMixin, networkVars)
 
+local function CreateEntranceLight()
+    
+    local entranceLight = Client.CreateRenderLight()
+    entranceLight:SetType( RenderLight.Type_Point )
+    entranceLight:SetColor( Color(1, .7, .2) )
+    entranceLight:SetIntensity( 3 )
+    entranceLight:SetRadius( 10 )
+    entranceLight:SetIsVisible(false)
+    
+    return entranceLight
+
+end
 -- Returns the number of non-collapsing tunnels active for the given team (assumes alien team if none specified).
 function Tunnel.GetLivingTunnelCount(teamNumber)
     
@@ -147,7 +161,7 @@ function Tunnel:OnCreate()
     InitMixin(self, EffectsMixin)
     
     if Server then
-        
+    
         InitMixin(self, EntityChangeMixin)
         
         self.exitAId = Entity.invalidId
@@ -201,6 +215,10 @@ local function CreateRandomTunnelProps(self)
     
     end
 
+end
+
+function Tunnel:GetIsDeadEnd()
+    return not self.exitAConnected or not self.exitBConnected
 end
 
 function Tunnel:OnInitialized()
@@ -300,6 +318,21 @@ end
 
 if Server then
     
+    function Tunnel:SetExits(exitA, exitB)
+    
+        assert(exitA)
+        assert(exitB)
+        
+        self.exitAId = exitA:GetId()
+        self.exitAEntityPosition = exitA:GetOrigin()
+        self.timeExitAChanged = Shared.GetTime()
+
+        self.exitBId = exitB:GetId()
+        self.exitBEntityPosition = exitB:GetOrigin()
+        self.timeExitBChanged = Shared.GetTime()
+    
+    end
+ 
     function Tunnel:GetConnectionStartPoint()
     
         if self.exitAConnected then
@@ -314,6 +347,17 @@ if Server then
             return self.exitBEntityPosition
         end
         
+    end
+    
+    function Tunnel:UpdateExit(exit)
+        
+        local exitId = exit:GetId()
+        if self.exitAId == exitId then
+            self.exitAEntityPosition = exit:GetOrigin()
+        elseif self.exitBId == exit:GetId() then
+            self.exitBEntityPosition = exit:GetOrigin()
+        end
+    
     end
     
     local function RemoveExitIdFromTunnel(self, id)
@@ -540,7 +584,11 @@ if Server then
         self:DestroyAsSoonAsVacant()
         
     end
-
+    
+    function Tunnel:TriggerCollapse()
+        self.collapsing = true
+    end
+    
     function Tunnel:StopCollapse()
         self.collapsing = false
         self.destroyingWhenVacant = false
@@ -602,6 +650,14 @@ if Server then
     
         self:UpdateActivityStatus()
         
+    end
+    
+    function Tunnel:GetOwnerClientId()
+        return self.ownerClientId
+    end
+    
+    function Tunnel:SetOwnerClientId(clientId)
+        self.ownerClientId = clientId
     end
     
     function Tunnel:MovePlayerToTunnel(player, entrance)

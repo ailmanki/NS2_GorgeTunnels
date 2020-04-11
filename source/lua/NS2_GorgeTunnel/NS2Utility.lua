@@ -2813,7 +2813,7 @@ function GetTexCoordsForTechId(techId)
         gTechIdPosition[kTechId.Stomp] = kDeathMessageIcon.Stomp
         gTechIdPosition[kTechId.BoneShield] = kDeathMessageIcon.BoneShield
 
-        --gTechIdPosition[kTechId.GorgeTunnelTech] = kDeathMessageIcon.GorgeTunnel
+        gTechIdPosition[kTechId.GorgeTunnelTech] = kDeathMessageIcon.GorgeTunnel
 
     end
 

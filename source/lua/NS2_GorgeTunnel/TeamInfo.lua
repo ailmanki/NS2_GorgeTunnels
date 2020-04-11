@@ -84,7 +84,9 @@ TeamInfo.kRelevantTechIdsMarine =
 
 TeamInfo.kRelevantTechIdsAlien =
 {
-
+    
+    kTechId.GorgeTunnelTech,
+    
     kTechId.CragHive,
     kTechId.UpgradeToCragHive,
     kTechId.Shell,

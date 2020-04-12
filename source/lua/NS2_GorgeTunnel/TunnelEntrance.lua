@@ -293,7 +293,7 @@ function TunnelEntrance:GetOwnerClientId()
 end
 
 function TunnelEntrance:GetGorgeOwner()
-    return self.ownerId ~= nil
+    return self.ownerId and self.ownerId ~= Entity.invalidId
 end
 
 function TunnelEntrance:GetDigestDuration()

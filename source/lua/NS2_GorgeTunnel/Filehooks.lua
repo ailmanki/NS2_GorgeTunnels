@@ -1,5 +1,4 @@
 ModLoader.SetupFileHook( "lua/AlienTeam.lua", "lua/NS2_GorgeTunnel/AlienTeam.lua", "replace" )
-ModLoader.SetupFileHook( "lua/BalanceMisc.lua", "lua/NS2_GorgeTunnel/BalanceMisc.lua", "replace" )
 ModLoader.SetupFileHook( "lua/CommanderHelp.lua", "lua/NS2_GorgeTunnel/CommanderHelp.lua", "replace" )
 ModLoader.SetupFileHook( "lua/NS2Utility.lua", "lua/NS2_GorgeTunnel/NS2Utility.lua", "replace" )
 ModLoader.SetupFileHook( "lua/PlayingTeam.lua", "lua/NS2_GorgeTunnel/PlayingTeam.lua", "replace" )

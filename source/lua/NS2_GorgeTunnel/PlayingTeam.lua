@@ -152,7 +152,7 @@ function PlayingTeam:ResetTeam()
 
     local initialTechPoint = self:GetInitialTechPoint()
     
-    local tower, commandStructure = self:SpawnInitialStructures(initialTechPoint)
+    local _, commandStructure = self:SpawnInitialStructures(initialTechPoint)
     
     self.conceded = false
     
@@ -185,7 +185,7 @@ function PlayingTeam:GetActiveTeamSkin()
     return nil
 end
 
-function PlayingTeam:SetStructureSkinIndex(data)
+function PlayingTeam:SetStructureSkinIndex()
 end
 
 function PlayingTeam:GetNumCapturedTechPoints()
@@ -803,7 +803,7 @@ function PlayingTeam:RespawnAllDeadPlayer()
     end
 end
 
-function PlayingTeam:Update(timePassed)
+function PlayingTeam:Update()
 
     PROFILE("PlayingTeam:Update")
     

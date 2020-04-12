@@ -1,9 +1,10 @@
 name        = "Gorge Tunnel"
 source_dir  = "source"
 output_dir  = "output"
-description = [=[Brings back the Gorge Tunnel!
-
-ModID: 7AA38154
+description = [=[Brings back the Gorge Tunnel!
+
+ModID: 7AA38154
+
 Commander is basically untouched, in addition he can infest the Gorge tunnel.]=]
 image       = "preview.jpg"
 tag_modtype = "Gameplay Tweak"

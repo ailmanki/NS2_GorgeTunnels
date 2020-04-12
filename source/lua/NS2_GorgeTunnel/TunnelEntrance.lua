@@ -35,6 +35,7 @@ Script.Load("lua/MapBlipMixin.lua")
 Script.Load("lua/CombatMixin.lua")
 Script.Load("lua/CommanderGlowMixin.lua")
 Script.Load("lua/ObstacleMixin.lua")
+Script.Load("lua/DigestMixin.lua")
 Script.Load("lua/InfestationMixin.lua")
 Script.Load("lua/AlienTunnelVariantMixin.lua")
 
@@ -44,6 +45,7 @@ class 'TunnelEntrance' (ScriptActor)
 
 TunnelEntrance.kMapName = "tunnelentrance"
 
+local kDigestDuration = 1.5
 local kTunnelInfestationRadius = 7
 
 TunnelEntrance.kModelName = PrecacheAsset("models/alien/tunnel/mouth.model")
@@ -121,6 +123,7 @@ function TunnelEntrance:OnCreate()
     InitMixin(self, UmbraMixin)
     InitMixin(self, MaturityMixin)
     InitMixin(self, CombatMixin)
+    InitMixin(self, DigestMixin)
     InitMixin(self, InfestationMixin)
 
     if Server then
@@ -829,14 +832,14 @@ function TunnelEntrance:GetHealthbarOffset()
     return 1
 end
 
-function TunnelEntrance:GetCanBeUsed(_, useSuccessTable)
-    useSuccessTable.useSuccess = false
+function TunnelEntrance:GetCanBeUsed(player, useSuccessTable)
+    useSuccessTable.useSuccess = useSuccessTable.useSuccess and self:GetCanDigest(player)
 end
-
 
 function TunnelEntrance:GetCanBeUsedConstructed()
-    return false
+    return true
 end
+
 
 function TunnelEntrance:OnConstruct(builder)
     if Server then

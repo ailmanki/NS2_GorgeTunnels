@@ -17,6 +17,8 @@ Script.Load("lua/MinimapConnectionMixin.lua")
 
 kTunnelExitSide = enum({'A', 'B'})
 
+kTunnelCollapseWarningDuration = 2
+
 dbgTunnelOptOn = true
 -- So tunnels don't ever overlap in world-space, keep track of which "slots" have tunnels in them.
 local tunnelSlots = {}
@@ -91,7 +93,7 @@ local kTunnelPropAttachPoints =
     { "Tunnel_attachPointGrnd_16", kTunnelPropType.Floor },
     { "Tunnel_attachPointGrnd_17", kTunnelPropType.Floor },
     { "Tunnel_attachPointGrnd_18", kTunnelPropType.Floor },
-    { "Tunnel_attachPointGrnd_19", kTunnelPropType.Floor }, 
+    { "Tunnel_attachPointGrnd_19", kTunnelPropType.Floor },
 }
 
 local networkVars =
@@ -133,26 +135,26 @@ function Tunnel.GetLivingTunnelCount(teamNumber)
     if not teamNumber then
         teamNumber = kTeam2Index
     end
-
+    
     local markedEntrances = {}
     local entrances = GetEntitiesForTeam("TunnelEntrance", teamNumber)
-
+    
     local count = 0
     for i = 1, #entrances do
         local entrance = entrances[i]
         local otherEntrance = entrance:GetOtherEntrance()
         if otherEntrance and not markedEntrances[otherEntrance:GetId()] then
             markedEntrances[entrance:GetId()] = true
-
+            
             count = count + 1
         end
     end
-
+    
     return count
 end
 
 function Tunnel:OnCreate()
-
+    
     Entity.OnCreate(self)
     
     InitMixin(self, BaseModelMixin)
@@ -161,7 +163,7 @@ function Tunnel:OnCreate()
     InitMixin(self, EffectsMixin)
     
     if Server then
-    
+        
         InitMixin(self, EntityChangeMixin)
         
         self.exitAId = Entity.invalidId
@@ -198,19 +200,19 @@ function Tunnel:OnCreate()
 end
 
 local function CreateRandomTunnelProps(self)
-
-    for i = 1, #kTunnelPropAttachPoints do
     
+    for i = 1, #kTunnelPropAttachPoints do
+        
         local attachPointEntry = kTunnelPropAttachPoints[i]
         local attachPointPosition = self:GetAttachPointOrigin(attachPointEntry[1])
         
         if attachPointPosition then
-        
+            
             local tunnelProp = CreateEntity(TunnelProp.kMapName, attachPointPosition)
             tunnelProp:SetParent(self)
             tunnelProp:SetTunnelPropType(attachPointEntry[2], math.max(0, i - 12))
             tunnelProp:SetAttachPoint(attachPointEntry[1])
-            
+        
         end
     
     end
@@ -222,9 +224,9 @@ function Tunnel:GetIsDeadEnd()
 end
 
 function Tunnel:OnInitialized()
-
+    
     self:SetModel(Tunnel.kModelName, kAnimationGraph)
-
+    
     if Server then
         
         self:SetOrigin((self.slotIndex-1) * kTunnelSpacing + kTunnelStart)
@@ -234,19 +236,19 @@ function Tunnel:OnInitialized()
         self.loopingSound:Start()
         
         self:SetPhysicsType(PhysicsType.Kinematic)
-      
-    elseif Client then
     
+    elseif Client then
+        
         self.tunnelLightCinematicA = Client.CreateCinematic(RenderScene.Zone_Default)
         self.tunnelLightCinematicA:SetCinematic(kTunnelLightA)
         self.tunnelLightCinematicA:SetRepeatStyle(Cinematic.Repeat_Endless)
-        self.tunnelLightCinematicA:SetCoords(self:GetCoords())        
+        self.tunnelLightCinematicA:SetCoords(self:GetCoords())
         self.tunnelLightCinematicA:SetIsVisible(self.exitAConnected)
         
         self.tunnelLightCinematicB = Client.CreateCinematic(RenderScene.Zone_Default)
         self.tunnelLightCinematicB:SetCinematic(kTunnelLightB)
         self.tunnelLightCinematicB:SetRepeatStyle(Cinematic.Repeat_Endless)
-        self.tunnelLightCinematicB:SetCoords(self:GetCoords())        
+        self.tunnelLightCinematicB:SetCoords(self:GetCoords())
         self.tunnelLightCinematicB:SetIsVisible(self.exitAConnected)
         
         self.tunnelCinematic = Client.CreateCinematic(RenderScene.Zone_Default)
@@ -271,7 +273,7 @@ function Tunnel:OnDestroy()
     
     Entity.OnDestroy(self)
     
-    if Server then 
+    if Server then
         
         self.loopingSound = nil
         FreeTunnelSlot(self.slotIndex)
@@ -286,8 +288,8 @@ function Tunnel:OnDestroy()
         if bEnt then
             bEnt:SetTunnel(nil)
         end
-        
-    elseif Client then 
+    
+    elseif Client then
         
         if self.tunnelLightCinematicA then
             Client.DestroyCinematic(self.tunnelLightCinematicA)
@@ -303,9 +305,9 @@ function Tunnel:OnDestroy()
             Client.DestroyCinematic(self.tunnelCinematic)
             self.tunnelCinematic = nil
         end
-        
-    end
     
+    end
+
 end
 
 local function GetEntitiesWithTagInTunnel(self, tag)
@@ -319,34 +321,34 @@ end
 if Server then
     
     function Tunnel:SetExits(exitA, exitB)
-    
+        
         assert(exitA)
         assert(exitB)
         
         self.exitAId = exitA:GetId()
         self.exitAEntityPosition = exitA:GetOrigin()
         self.timeExitAChanged = Shared.GetTime()
-
+        
         self.exitBId = exitB:GetId()
         self.exitBEntityPosition = exitB:GetOrigin()
         self.timeExitBChanged = Shared.GetTime()
     
     end
- 
-    function Tunnel:GetConnectionStartPoint()
     
+    function Tunnel:GetConnectionStartPoint()
+        
         if self.exitAConnected then
             return self.exitAEntityPosition
         end
-        
+    
     end
     
     function Tunnel:GetConnectionEndPoint()
-    
+        
         if self.exitBConnected then
             return self.exitBEntityPosition
         end
-        
+    
     end
     
     function Tunnel:UpdateExit(exit)
@@ -373,7 +375,7 @@ if Server then
         end
         
         return true
-        
+    
     end
     
     -- Makes the given TunnelEntrance entity no longer an exit of the tunnel.  The given entity
@@ -388,7 +390,7 @@ if Server then
         if not RemoveExitIdFromTunnel(self, id) then
             assert(false) -- RemoveExit called with entity that wasn't either of the two exits!
         end
-        
+    
     end
     
     function Tunnel:OnEntityChange(oldId)
@@ -396,7 +398,7 @@ if Server then
         if oldId ~= Entity.invalidId then
             RemoveExitIdFromTunnel(self, oldId)
         end
-        
+    
     end
     
     -- Makes the given TunnelEntrance entity an exit of the tunnel.  The tunnel must not already
@@ -422,9 +424,9 @@ if Server then
         else
             assert(false) -- AddExit called when both ends were already set!
         end
-
-        self:StopCollapse()
         
+        self:StopCollapse()
+    
     end
     
     local function DestroyAllUnitsInside(self)
@@ -434,9 +436,9 @@ if Server then
             local unit = entities[i]
             unit:Kill()
         end
-        
+    
     end
-
+    
     local kExitOffset = Vector(0, 0.3, 0)
     
     function Tunnel:UseExit(entity, exit, exitSide)
@@ -461,7 +463,7 @@ if Server then
             newAngles.roll = 0
             newAngles.yaw = newAngles.yaw + self:GetMinimapYawOffset()
             entity:SetOffsetAngles(newAngles)
-            
+        
         end
         
         exit:OnEntityExited(entity)
@@ -471,7 +473,7 @@ if Server then
         elseif exitSide == kTunnelExitSide.B then
             self.timeExitBUsed = Shared.GetTime()
         end
-        
+    
     end
     
     local function ApplyDOTToEntity(ent, dps, deltaTime)
@@ -485,12 +487,12 @@ if Server then
         else
             ent:TakeDamage(dps * deltaTime, nil, nil, nil, nil, 0, dps * deltaTime, kDamageType.Normal)
         end
-        
+    
     end
     
     -- Checks if the tunnel is vacated, and if so, destroys it.
     function Tunnel:UpdateTunnelDestruction()
-
+        
         if not self.destroyingWhenVacant then
             return false
         end
@@ -499,11 +501,11 @@ if Server then
         if #ents > 0 then
             return 1 -- check again later
         end
-
+        
         DestroyEntity(self)
         
         return false
-        
+    
     end
     
     -- Sets up a callback that checks if the tunnel is empty (all entities living or dead) and if
@@ -514,12 +516,12 @@ if Server then
         
         self.destroyingWhenVacant = true
         self:AddTimedCallback(Tunnel.UpdateTunnelDestruction, 1)
-        
+    
     end
-
+    
     -- Apply a DOT on all the players left inside the tunnel.
     function Tunnel:UpdateCollapseDoT()
-
+        
         if not self.collapsing then
             return false
         end
@@ -547,7 +549,7 @@ if Server then
         
         -- Repeat this callback next update, so we can apply the dot again.
         return 0
-        
+    
     end
     
     function Tunnel:BeginCollapseDoT()
@@ -555,7 +557,7 @@ if Server then
         self:AddTimedCallback(Tunnel.UpdateCollapseDoT, 0)
         
         return false -- don't repeat
-        
+    
     end
     
     function Tunnel:BeginCollapse()
@@ -582,7 +584,7 @@ if Server then
         -- Tunnel entities are destroyed after a collapse (and during a collapse, players cannot
         -- reenter the tunnel).
         self:DestroyAsSoonAsVacant()
-        
+    
     end
     
     function Tunnel:TriggerCollapse()
@@ -603,7 +605,7 @@ if Server then
     end
     
     function Tunnel:UpdateFlinchAmount()
-
+        
         local exitA = self:GetExitA()
         local exitB = self:GetExitB()
         
@@ -614,11 +616,11 @@ if Server then
             local normalizedTimeDiff = math.min(math.max((Shared.GetTime() - self.timeCollapseStart) / kTunnelCollapseWarningDuration, 0.0), 1.0)
             self.flinchTotalAmount = normalizedTimeDiff
         end
-
+    
     end
-  
+    
     function Tunnel:SetActiveTunnelContents(active)
-      
+        
         local props = GetEntitiesWithTagInTunnel(self, "class:TunnelProp")
         for index = 1, #props do
             local prop = props[index]
@@ -626,9 +628,9 @@ if Server then
         end
         self.tunnelContentsActive = active
         -- Log("%s: %s tunnel props %s", self, #props, active and "activated" or "deactivated")
-
+    
     end
-  
+    
     function Tunnel:UpdateActivityStatus()
         -- Turn on/off update status for tunnels depending on if they contain players
         local containsPlayers = #GetEntitiesWithTagInTunnel(self, "class:Player") > 0
@@ -636,7 +638,7 @@ if Server then
             self:SetActiveTunnelContents(true)
         end
         if not containsPlayers and self.tunnelContentsActive then
-             self:SetActiveTunnelContents(false)
+            self:SetActiveTunnelContents(false)
         end
     
     end
@@ -644,12 +646,12 @@ if Server then
     function Tunnel:OnUpdate()
         
         self.exitAUsed = self.timeExitAUsed + 0.2 > Shared.GetTime()
-        self.exitBUsed = self.timeExitBUsed + 0.2 > Shared.GetTime() 
+        self.exitBUsed = self.timeExitBUsed + 0.2 > Shared.GetTime()
         
         self:UpdateFlinchAmount()
-    
-        self:UpdateActivityStatus()
         
+        self:UpdateActivityStatus()
+    
     end
     
     function Tunnel:GetOwnerClientId()
@@ -661,7 +663,7 @@ if Server then
     end
     
     function Tunnel:MovePlayerToTunnel(player, entrance)
-    
+        
         assert(player)
         assert(entrance)
         
@@ -674,32 +676,32 @@ if Server then
         --Two sound effects required here for inside and outside a tunnel
         --Required to call effects manager due to sound-parenting behaviors
         if entranceId == self.exitAId then
-        
+            
             player:SetOrigin(self:GetEntranceAPosition())
             newAngles.yaw = GetYawFromVector(self:GetCoords().zAxis)
             player:SetOffsetAngles(newAngles)
             self:TriggerEffects("tunnel_enter_3D", { effecthostcoords = player:GetCoords() })
             self:TriggerEffects("tunnel_enter_3D", { effecthostcoords = entrance:GetCoords() })
-            self.timeExitAUsed = Shared.GetTime()   
-            
-        elseif entranceId == self.exitBId then
+            self.timeExitAUsed = Shared.GetTime()
         
+        elseif entranceId == self.exitBId then
+            
             player:SetOrigin(self:GetEntranceBPosition())
             newAngles.yaw = GetYawFromVector(-self:GetCoords().zAxis)
             player:SetOffsetAngles(newAngles)
             self:TriggerEffects("tunnel_enter_3D", { effecthostcoords = player:GetCoords() })
             self:TriggerEffects("tunnel_enter_3D", { effecthostcoords = entrance:GetCoords() })
             self.timeExitBUsed = Shared.GetTime()
-            
+        
         end
     
-  end
-  
+    end
+
 else
     -- Predict or Client
     
     function Tunnel:OnUpdateRender()
-    
+        
         self.tunnelLightCinematicA:SetIsVisible(self.exitAConnected)
         self.tunnelLightCinematicB:SetIsVisible(self.exitBConnected)
     
@@ -728,25 +730,25 @@ function Tunnel:GetFractionalPosition( position )
 end
 
 function Tunnel:GetRelativePosition(position)
-
+    
     local fractionPos = ( (-self:GetCoords().zAxis):DotProduct( self:GetOrigin() - position ) + kTunnelLength *.5) / kTunnelLength
     return (self.exitBEntityPosition - self.exitAEntityPosition) * fractionPos + self.exitAEntityPosition
 
 end
 
 function Tunnel:GetMinimapYawOffset()
-
+    
     if self.exitAEntityPosition == self.exitBEntityPosition then
         return 0
     end
-
+    
     local tunnelDirection = GetNormalizedVector( self.exitBEntityPosition - self.exitAEntityPosition )
     return math.atan2(tunnelDirection.x, tunnelDirection.z)
 
 end
 
 function Tunnel:OnUpdatePoseParameters()
-
+    
     self:SetPoseParam("intensity_yn", self.flinchBAmount)
     self:SetPoseParam("intensity_yp", self.flinchAAmount)
     self:SetPoseParam("intensity", self.flinchTotalAmount)
@@ -754,16 +756,16 @@ function Tunnel:OnUpdatePoseParameters()
 end
 
 function Tunnel:OnUpdateAnimationInput(modelMixin)
-
+    
     PROFILE("Tunnel:OnUpdateAnimationInput")
-
+    
     modelMixin:SetAnimationInput("entrance_A_opened", self.exitAConnected)
     modelMixin:SetAnimationInput("entrance_B_opened", self.exitBConnected)
     
     modelMixin:SetAnimationInput("exit_A", self.exitAUsed)
     modelMixin:SetAnimationInput("exit_B", self.exitBUsed)
-    
-end    
+
+end
 
 Shared.LinkClassToMap("Tunnel", Tunnel.kMapName, networkVars)
 
@@ -771,7 +773,7 @@ local function GetClosestLivingEntityWithClassToPoint(entClass, pt)
     local ents = EntityListToTable(Shared.GetEntitiesWithClassname(entClass))
     local closest
     local closestDist
-
+    
     for i=1, #ents do
         local dist = (pt - ents[i]:GetOrigin()):GetLengthSquared()
         if (not closest or closestDist > dist) and ents[i]:GetIsAlive() then
@@ -821,7 +823,7 @@ if Server then
         end
         
         entranceToKill:Kill()
-        
-    end)
     
+    end)
+
 end

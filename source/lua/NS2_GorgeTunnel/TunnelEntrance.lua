@@ -292,6 +292,10 @@ function TunnelEntrance:GetOwnerClientId()
     return self.ownerClientId
 end
 
+function TunnelEntrance:GetGorgeOwner()
+    return self.ownerId ~= nil
+end
+
 function TunnelEntrance:GetDigestDuration()
     return kDigestDuration
 end
@@ -402,15 +406,15 @@ function TunnelEntrance:SetOtherEntrance(otherEntranceEnt)
 end
 
 function TunnelEntrance:GetCanBuildOtherEnd()
-    return not self:GetHasOtherEntrance() and not self:GetIsCollapsing()
+    return not self:GetGorgeOwner() and not self:GetHasOtherEntrance() and not self:GetIsCollapsing()
 end
 
 function TunnelEntrance:GetCanTriggerCollapse()
-    return self:GetIsBuilt() and not self:GetIsCollapsing() and not self:GetIsResearching()
+    return not self:GetGorgeOwner() and self:GetIsBuilt() and not self:GetIsCollapsing() and not self:GetIsResearching()
 end
 
 function TunnelEntrance:GetCanRelocate()
-    return self:GetHasOtherEntrance() and self:GetIsBuilt() and not self:GetIsCollapsing()
+    return not self:GetGorgeOwner() and self:GetHasOtherEntrance() and self:GetIsBuilt() and not self:GetIsCollapsing()
 end
 
 function TunnelEntrance:GetCanUpgradeToInfestedTunnel()
@@ -637,9 +641,9 @@ if Server then
     end
     
     function TunnelEntrance:UpdateConnectedTunnel()
-        
         local hasValidTunnel = self.tunnelId ~= nil and Shared.GetEntity(self.tunnelId) ~= nil
-        
+    
+       
         if hasValidTunnel or self:GetOwnerClientId() == nil or not self:GetIsBuilt() then
             return
         end
@@ -647,31 +651,47 @@ if Server then
         local foundTunnel
         
         -- register if a tunnel entity already exists or a free tunnel has been found
-        for index, tunnel in ientitylist( Shared.GetEntitiesWithClassname("Tunnel") ) do
-            
+        for _, tunnel in ientitylist( Shared.GetEntitiesWithClassname("Tunnel") ) do
             if tunnel:GetOwnerClientId() == self:GetOwnerClientId() then
-                
                 foundTunnel = tunnel
                 break
-            
-            elseif not foundTunnel and not tunnel:GetOwnerClientId() then
-                
-                foundTunnel = tunnel
-            
             end
-        
         end
-        
+       -- local newTunnel = false
         if not foundTunnel then
             -- no tunnel entity present
             foundTunnel = CreateEntity(Tunnel.kMapName, nil, self:GetTeamNumber())
+            --newTunnel = true
         end
-        
+    
         -- check if there is another tunnel entrance to connect with
         foundTunnel:SetOwnerClientId(self:GetOwnerClientId())
-        foundTunnel:AddExit(self)
+    
+        local selfId = self:GetId()
+        if foundTunnel.exitAId ~= selfId and foundTunnel.exitBId  ~= selfId then
+            foundTunnel:AddExit(self)
+        end
         self.tunnelId = foundTunnel:GetId()
     
+        local foundTunnelEntrance
+        -- register if a tunnel entity already exists or a free tunnel has been found
+        for _, tunnelEntrance in ientitylist( Shared.GetEntitiesWithClassname("TunnelEntrance") ) do
+            if tunnelEntrance:GetOwnerClientId() == self:GetOwnerClientId() and tunnelEntrance ~= self then
+                foundTunnelEntrance = tunnelEntrance
+                break
+            end
+        end
+    
+        self:SetOtherEntrance(foundTunnelEntrance)
+        
+        if (foundTunnelEntrance) then
+            foundTunnelEntrance:SetOtherEntrance(self)
+            local foundTunnelEntranceId = foundTunnelEntrance:GetId()
+            if foundTunnel.exitAId ~= foundTunnelEntranceId and foundTunnel.exitBId  ~= foundTunnelEntranceId then
+                foundTunnel:AddExit(foundTunnelEntrance)
+            end
+        end
+        
     end
     
     -- Sets the Tunnel entity that this TunnelEntrance leads to.  Also handles informing the Tunnel entity.
@@ -708,37 +728,42 @@ if Server then
     end
 
     function TunnelEntrance:OnConstructionComplete()
-        
+    
         -- Just finished construction, so open animation should play (if it is open).  This is to prevent the open
         -- animation from playing when the tunnel comes into view.
         self.skipOpenAnimation = false
         
-        -- If the tunnel entrance has another (completed) tunnel entrance, ensure a tunnel connects the two together.
-        local otherEntrance = self:GetOtherEntrance()
-
-        -- If the other side started the infestation research before this side finished building, we want to set our progress to match.
-        if otherEntrance and otherEntrance:GetIsResearching() then
-            self.researchProgress = otherEntrance.researchProgress
-        end
-
-        if otherEntrance and otherEntrance:GetIsBuilt() then
-            
-            assert(self:GetTunnelEntity() == nil) -- this TunnelEntrance should not already have a tunnel assigned to it.
-            
-            -- See if the other entrance already has a tunnel assigned to it (eg this is a relocate).
-            local tunnel = otherEntrance:GetTunnelEntity()
-            if not tunnel then
-                
-                -- Create a new tunnel since neither of the two entrances had one.
-                tunnel = CreateEntity(Tunnel.kMapName, nil, self:GetTeamNumber())
-                otherEntrance:SetTunnel(tunnel)
-                
-            end
-            
-            self:SetTunnel(tunnel)
-            
-        end
+        if self:GetGorgeOwner() then
+            self:UpdateConnectedTunnel()
+        else
         
+            -- If the tunnel entrance has another (completed) tunnel entrance, ensure a tunnel connects the two together.
+            local otherEntrance = self:GetOtherEntrance()
+        
+            -- If the other side started the infestation research before this side finished building, we want to set our progress to match.
+            if otherEntrance and otherEntrance:GetIsResearching() then
+                self.researchProgress = otherEntrance.researchProgress
+            end
+        
+            if otherEntrance and otherEntrance:GetIsBuilt() then
+        
+                assert(self:GetTunnelEntity() == nil) -- this TunnelEntrance should not already have a tunnel assigned to it.
+        
+                -- See if the other entrance already has a tunnel assigned to it (eg this is a relocate).
+                local tunnel = otherEntrance:GetTunnelEntity()
+                if not tunnel then
+        
+                    -- Create a new tunnel since neither of the two entrances had one.
+                    tunnel = CreateEntity(Tunnel.kMapName, nil, self:GetTeamNumber())
+                    otherEntrance:SetTunnel(tunnel)
+        
+                end
+        
+                self:SetTunnel(tunnel)
+        
+            end
+    
+        end
     end
     
     function TunnelEntrance:UpdateDestruction()

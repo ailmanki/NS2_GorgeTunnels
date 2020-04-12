@@ -127,11 +127,13 @@ function Tunnel.GetLivingTunnelCount(teamNumber)
     local count = 0
     for i = 1, #entrances do
         local entrance = entrances[i]
-        local otherEntrance = entrance:GetOtherEntrance()
-        if otherEntrance and not markedEntrances[otherEntrance:GetId()] then
-            markedEntrances[entrance:GetId()] = true
+        if not entrance:GetGorgeOwner() then
+            local otherEntrance = entrance:GetOtherEntrance()
+            if otherEntrance and not markedEntrances[otherEntrance:GetId()] then
+                markedEntrances[entrance:GetId()] = true
             
-            count = count + 1
+                count = count + 1
+            end
         end
     end
     

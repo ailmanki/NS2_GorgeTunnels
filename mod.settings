@@ -5,7 +5,9 @@ description = [=[Brings back the Gorge Tunnel!
 
 ModID: 7AA38154
 
-Commander is basically untouched, in addition he can infest the Gorge tunnel.]=]
+Commander is basically untouched, in addition he can infest the Gorge tunnel.
+Costs 8 res in vanilla per entrance.
+In combat mod a entrance costs 1 point.]=]
 image       = "preview.jpg"
 tag_modtype = "Gameplay Tweak"
 tag_support = "Must be run on Server"

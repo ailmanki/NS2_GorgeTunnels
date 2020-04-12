@@ -1,7 +1,11 @@
-name        = "NS2_GorgeTunnel"
-source_dir  = "source/"
-output_dir  = "output/"
-description = [=[NS2_GorgeTunnel]=]
+name        = "Gorge Tunnel"
+source_dir  = "source"
+output_dir  = "output"
+description = [=[Brings back the Gorge Tunnel!
+
+ModID: 7AA38154
+Commander is basically untouched, in addition he can infest the Gorge tunnel.]=]
 image       = "preview.jpg"
 tag_modtype = "Gameplay Tweak"
 tag_support = "Must be run on Server"
+publish_id = "7aa38154"

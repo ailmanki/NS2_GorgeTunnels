@@ -689,6 +689,7 @@ if Server then
             local foundTunnelEntranceId = foundTunnelEntrance:GetId()
             if foundTunnel.exitAId ~= foundTunnelEntranceId and foundTunnel.exitBId  ~= foundTunnelEntranceId then
                 foundTunnel:AddExit(foundTunnelEntrance)
+                foundTunnelEntrance.tunnelId = self.tunnelId
             end
         end
         

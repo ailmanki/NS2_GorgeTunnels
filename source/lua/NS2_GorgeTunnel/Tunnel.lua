@@ -17,8 +17,6 @@ Script.Load("lua/MinimapConnectionMixin.lua")
 
 kTunnelExitSide = enum({'A', 'B'})
 
-dbgTunnelOptOn = false
-
 -- So tunnels don't ever overlap in world-space, keep track of which "slots" have tunnels in them.
 local tunnelSlots = {}
 function GetNextAvailableTunnelSlot() -- reserves and returns the next available "tunnel slot" index.
@@ -115,18 +113,6 @@ AddMixinNetworkVars(BaseModelMixin, networkVars)
 AddMixinNetworkVars(ModelMixin, networkVars)
 AddMixinNetworkVars(TeamMixin, networkVars)
 
-local function CreateEntranceLight()
-    
-    local entranceLight = Client.CreateRenderLight()
-    entranceLight:SetType( RenderLight.Type_Point )
-    entranceLight:SetColor( Color(1, .7, .2) )
-    entranceLight:SetIntensity( 3 )
-    entranceLight:SetRadius( 10 )
-    entranceLight:SetIsVisible(false)
-    
-    return entranceLight
-
-end
 -- Returns the number of non-collapsing tunnels active for the given team (assumes alien team if none specified).
 function Tunnel.GetLivingTunnelCount(teamNumber)
     

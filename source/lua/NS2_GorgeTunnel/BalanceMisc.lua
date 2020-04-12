@@ -115,6 +115,9 @@ kLerkSporeShootRange = 10
 -- entrance and exit
 kNumGorgeTunnels = 2
 
+kTunnelCollapseWarningDuration = 5.0
+kTunnelCollapseDPS = 10
+
 -- maturation time for alien buildings
 kHiveMaturationTime = 220
 kHarvesterMaturationTime = 150

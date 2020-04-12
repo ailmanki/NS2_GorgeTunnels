@@ -17,9 +17,8 @@ Script.Load("lua/MinimapConnectionMixin.lua")
 
 kTunnelExitSide = enum({'A', 'B'})
 
-kTunnelCollapseWarningDuration = 2
+dbgTunnelOptOn = false
 
-dbgTunnelOptOn = true
 -- So tunnels don't ever overlap in world-space, keep track of which "slots" have tunnels in them.
 local tunnelSlots = {}
 function GetNextAvailableTunnelSlot() -- reserves and returns the next available "tunnel slot" index.

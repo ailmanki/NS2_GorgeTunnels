@@ -4,7 +4,7 @@ output_dir  = "output"
 description = [=[Brings back the Gorge Tunnel!
 
 Commander can drop tunnels just like in vanilla, in addition he can upgrade a Gorge Tunnel to an Infested Tunnel.
-- Costs 8 res in vanilla per entrance.
+- Costs 5 res in vanilla per entrance.
 - In combat mod a entrance costs 1 point.
 
 

@@ -3,17 +3,26 @@ source_dir  = "source"
 output_dir  = "output"
 description = [=[Brings back the Gorge Tunnel!
 
-ModID: 7AA38154
-
-Commander is basically untouched, in addition he can infest the Gorge tunnel.
+Commander can drop tunnels just like in vanilla, in addition he can upgrade a Gorge Tunnel to an Infested Tunnel.
 - Costs 8 res in vanilla per entrance.
 - In combat mod a entrance costs 1 point.
 
-History
 
+History
 In 2013 Gorge Tunnels where add to NS2, with the [url=unknownworlds.com/ns2/gorgeous-changelog] Gorgeous Update [/url].
-Six years later in 2019 [url=unknownworlds.com/ns2/build-327-balance-patch-notes/] Build 327 [/url] moved Gorge Tunnels
- to the commander.]=]
+Six years later in 2019 [url=unknownworlds.com/ns2/build-327-balance-patch-notes/] Build 327 [/url] moved Gorge Tunnels to the commander.
+
+
+Thanks to
+- the creators of NS2 for the original Gorge Tunnels!
+- spawnof2000 for testing with me!
+- Muse for creating a lovely preview picture!
+- neo for pressuring me to make Gorge Tunnels happen!
+- all players on Wooza for live testing and chitchat!
+
+
+ModID
+7AA38154]=]
 image       = "preview.jpg"
 tag_modtype = "Gameplay Tweak"
 tag_support = "Must be run on Server"

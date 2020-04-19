@@ -10,6 +10,10 @@ Script.Load("lua/Weapons/Alien/Ability.lua")
 Script.Load("lua/Weapons/Alien/HydraAbility.lua")
 Script.Load("lua/Weapons/Alien/ClogAbility.lua")
 Script.Load("lua/NS2_GorgeTunnel/Weapons/Alien/GorgeTunnelAbility.lua")
+Script.Load("lua/NS2_GorgeTunnel/Weapons/Alien/WhipAbility.lua")
+Script.Load("lua/NS2_GorgeTunnel/Weapons/Alien/CragAbility.lua")
+Script.Load("lua/NS2_GorgeTunnel/Weapons/Alien/ShadeAbility.lua")
+Script.Load("lua/NS2_GorgeTunnel/Weapons/Alien/ShiftAbility.lua")
 Script.Load("lua/Weapons/Alien/WebsAbility.lua")
 Script.Load("lua/Weapons/Alien/BabblerEggAbility.lua")
 
@@ -23,7 +27,7 @@ DropStructureAbility.kMapName = "drop_structure_ability"
 PrecacheAsset("sound/NS2.fev/alien/gorge/create_fail")
 local kAnimationGraph = PrecacheAsset("models/alien/gorge/gorge_view.animation_graph")
 
-DropStructureAbility.kSupportedStructures = { HydraStructureAbility, ClogAbility, WebsAbility, GorgeTunnelAbility, BabblerEggAbility }
+DropStructureAbility.kSupportedStructures = { HydraStructureAbility, ClogAbility, WebsAbility, GorgeTunnelAbility, BabblerEggAbility, WhipStructureAbility, CragStructureAbility, ShadeStructureAbility, ShiftStructureAbility  }
 
 local networkVars =
 {
@@ -32,6 +36,7 @@ local networkVars =
     numClogsLeft = string.format("private integer (0 to %d)", kMaxStructuresPerType),
     numTunnelsLeft = string.format("private integer (0 to %d)", kMaxStructuresPerType),
     numBabblersLeft = string.format("private integer (0 to %d)", kMaxStructuresPerType),
+    numStructuresLeft = string.format("private integer (0 to %d)", kMaxStructuresPerType),
 }
 
 function DropStructureAbility:GetAnimationGraphName()
@@ -62,6 +67,7 @@ function DropStructureAbility:OnCreate()
     self.numClogsLeft = 0
     self.numTunnelsLeft = 0
     self.numBabblersLeft = 0
+    self.numStructuresLeft = 0
     self.lastClickedPosition = nil
 
 end
@@ -106,7 +112,11 @@ function DropStructureAbility:GetNumStructuresBuilt(techId)
     if techId == kTechId.BabblerEgg then
         return self.numBabblersLeft
     end
-
+    
+    if techId == kTechId.GorgeCrag or techId == kTechId.GorgeShade or techId == kTechId.GorgeShift or techId == kTechId.GorgeWhip then
+        return self.numStructuresLeft
+    end
+    
     -- unlimited
     return -1
 end
@@ -536,6 +546,7 @@ function DropStructureAbility:ProcessMoveOnWeapon(input)
             local numAllowedTunnels = LookupTechData(kTechId.GorgeTunnel, kTechDataMaxAmount, -1)
             local numAllowedWebs = LookupTechData(kTechId.Web, kTechDataMaxAmount, -1)
             local numAllowedBabblers = LookupTechData(kTechId.BabblerEgg, kTechDataMaxAmount, -1)
+            local numAllowedStructures = LookupTechData(kTechId.GorgeWhip, kTechDataMaxAmount, -1)
 
             if numAllowedHydras >= 0 then
                 self.numHydrasLeft = team:GetNumDroppedGorgeStructures(player, kTechId.Hydra)
@@ -556,7 +567,10 @@ function DropStructureAbility:ProcessMoveOnWeapon(input)
             if numAllowedBabblers >= 0 then
                 self.numBabblersLeft = team:GetNumDroppedGorgeStructures(player, kTechId.BabblerEgg)
             end
-
+    
+            if numAllowedStructures >= 0 then
+                self.numStructuresLeft = team:GetNumDroppedGorgeStructures(player, kTechId.Whip) + team:GetNumDroppedGorgeStructures(player, kTechId.Crag) + team:GetNumDroppedGorgeStructures(player, kTechId.Shift) + team:GetNumDroppedGorgeStructures(player, kTechId.Shade)
+            end
         end
 
     end
@@ -705,7 +719,11 @@ if Client then
             else
 
                 -- If player wants to switch to this, open build menu immediately
-                local weaponSwitchCommands = { Move.Weapon1, Move.Weapon2, Move.Weapon3, Move.Weapon4, Move.Weapon5 }
+                -- reload for whip
+                -- drop for crag
+                -- use for shade
+                -- ToggleFlashlight for shift
+                local weaponSwitchCommands = { Move.Weapon1, Move.Weapon2, Move.Weapon3, Move.Weapon4, Move.Weapon5, Move.Reload, Move.Drop, Move.Use, Move.ToggleFlashlight }
                 local thisCommand = weaponSwitchCommands[ self:GetHUDSlot() ]
 
                 if bit.band( input.commands, thisCommand ) ~= 0 then

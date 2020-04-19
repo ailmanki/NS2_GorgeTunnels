@@ -971,6 +971,10 @@ function AlienTeam:InitTechTree()
 
     -- gorge structures
     self.techTree:AddBuildNode(kTechId.GorgeTunnel)
+    self.techTree:AddBuildNode(kTechId.GorgeWhip)
+    self.techTree:AddBuildNode(kTechId.GorgeCrag)
+    self.techTree:AddBuildNode(kTechId.GorgeShift)
+    self.techTree:AddBuildNode(kTechId.GorgeShade)
     self.techTree:AddBuildNode(kTechId.Hydra)
     self.techTree:AddBuildNode(kTechId.Clog)
 

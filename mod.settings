@@ -1,10 +1,14 @@
-name        = "Gorge Tunnel"
+name        = "Gorge Enhanced"
 source_dir  = "source"
 output_dir  = "output"
-description = [=[Brings back the Gorge Tunnel!
+description = [=[Brings toys for the Gorge!
 
+Gorge can now not only drop a tunnel, but also whips, crags, shifts and shade.
+
+
+Includes Gorge Tunnel!
 Commander can drop tunnels just like in vanilla, in addition he can upgrade a Gorge Tunnel to an Infested Tunnel.
-- Costs 5 res in vanilla per entrance.
+- Costs 5 res per entrance.
 - In combat mod a entrance costs 1 point.
 
 
@@ -22,8 +26,7 @@ Thanks to
 
 
 ModID
-7AA38154]=]
+]=]
 image       = "preview.jpg"
 tag_modtype = "Gameplay Tweak"
 tag_support = "Must be run on Server"
-publish_id = "7aa38154"

@@ -2077,7 +2077,7 @@ end
 local allowedWarmUpStrcutures = {
     "Hydra",
     "Clog",
-    "TunnelEntrance"
+    "TunnelEntrance",
 }
 function GetValidTargetInWarmUp(target)
 

@@ -739,6 +739,8 @@ if Server then
         
         if self:GetGorgeOwner() then
             self:UpdateConnectedTunnel()
+            self:UpgradeToTechId(kTechId.InfestedTunnel)
+            self:SetDesiredInfestationRadius(self:GetInfestationMaxRadius())
         else
         
             -- If the tunnel entrance has another (completed) tunnel entrance, ensure a tunnel connects the two together.

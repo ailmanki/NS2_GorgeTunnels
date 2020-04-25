@@ -128,24 +128,12 @@ function Whip:OnCreate()
     self:SetUpdates(true, kRealTimeUpdateRate)
     
     if Server then
-        InitMixin(self, OwnerMixin)
+       -- InitMixin(self, OwnerMixin)
         self.targetId = Entity.invalidId
         self.nextAttackTime = 0
         
     end
 
-end
-
-if not Server then
-    function Whip:GetOwner()
-        return self.ownerId ~= nil and Shared.GetEntity(self.ownerId)
-    end
-end
-function Whip:GetDigestDuration()
-    return kDigestDuration
-end
-function Whip:GetCanDigest(player)
-    return player == self:GetOwner() and player:isa("Gorge") and (not HasMixin(self, "Live") or self:GetIsAlive()) --and self:GetIsBuilt()
 end
 
 function Whip:OnInitialized()
@@ -431,4 +419,37 @@ if Client then
 
 end
 
+function Whip:GetGorgeOwner()
+    return self.ownerId ~= nil and self.ownerId ~= Entity.invalidId
+end
+function Whip:GetCanBeUsedConstructed()
+    return true
+end
+if not Server then
+    function Whip:GetOwner()
+        return self.ownerId ~= nil and Shared.GetEntity(self.ownerId)
+    end
+end
+function Whip:GetDigestDuration()
+    return kDigestDuration
+end
+function Whip:GetCanDigest(player)
+    return player == self:GetOwner() and player:isa("Gorge") and (not HasMixin(self, "Live") or self:GetIsAlive()) --and self:GetIsBuilt()
+end
+
+function Whip:GetCanTeleportOverride()
+    return not self:GetGorgeOwner()
+end
+
+function Whip:GetCanConsumeOverride()
+    return not self:GetGorgeOwner()
+end
+
+function Whip:GetCanRelocate()
+    return not self:GetGorgeOwner()
+end
+
+function Whip:GetCanReposition()
+    return not self:GetGorgeOwner()
+end
 Shared.LinkClassToMap("Whip", Whip.kMapName, networkVars, true)

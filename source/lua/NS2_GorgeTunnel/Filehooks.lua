@@ -1,5 +1,8 @@
 ModLoader.SetupFileHook( "lua/AlienTeam.lua", "lua/NS2_GorgeTunnel/AlienTeam.lua", "replace" )
 ModLoader.SetupFileHook( "lua/Balance.lua", "lua/NS2_GorgeTunnel/Balance.lua", "post" )
+ModLoader.SetupFileHook( "lua/Crag.lua", "lua/NS2_GorgeTunnel/Crag.lua", "replace" )
+ModLoader.SetupFileHook( "lua/Shade.lua", "lua/NS2_GorgeTunnel/Shade.lua", "replace" )
+ModLoader.SetupFileHook( "lua/Shift.lua", "lua/NS2_GorgeTunnel/Shift.lua", "replace" )
 ModLoader.SetupFileHook( "lua/CommanderHelp.lua", "lua/NS2_GorgeTunnel/CommanderHelp.lua", "replace" )
 ModLoader.SetupFileHook( "lua/GUIGorgeBuildMenu.lua", "lua/NS2_GorgeTunnel/GUIGorgeBuildMenu.lua", "replace" )
 ModLoader.SetupFileHook( "lua/NS2Utility.lua", "lua/NS2_GorgeTunnel/NS2Utility.lua", "replace" )

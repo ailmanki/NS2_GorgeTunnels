@@ -11,7 +11,6 @@
 --
 -- ========= For more information, visit us at http://www.unknownworlds.com =====================
 
-Script.Load("lua/OwnerMixin.lua")
 Script.Load("lua/Mixins/ClientModelMixin.lua")
 Script.Load("lua/LiveMixin.lua")
 Script.Load("lua/UpgradableMixin.lua")
@@ -89,7 +88,7 @@ local networkVars =
     -- For client animations
     healingActive = "boolean",
     healWaveActive = "boolean",
-    
+    gorge = "boolean",
     moving = "boolean",
     ownerId = "entityid"
 }
@@ -156,13 +155,12 @@ function Crag:OnCreate()
     
     self.healingActive = false
     self.healWaveActive = false
-    
+    self.gorge = false
     self:SetUpdates(true, Crag.kThinkInterval)
     
     InitMixin(self, FireMixin)
     
     if Server then
-        InitMixin(self, OwnerMixin)
         InitMixin(self, InfestationTrackerMixin)
     elseif Client then    
         InitMixin(self, CommanderGlowMixin)    
@@ -214,7 +212,17 @@ function Crag:GetBioMassLevel()
     return kCragBiomass
 end
 
-
+function Crag:OnDestroy()
+    AlienStructure.OnDestroy(self)
+    if Server then
+        if self.gorge and self.consumed then
+            player = self:GetOwner()
+            if player then
+                player:AddResources(kGorgeCragCostDigest)
+            end
+        end
+    end
+end
 function Crag:OverrideRepositioningSpeed()
     return kAlienStructureMoveSpeed * 2.5
 end
@@ -468,14 +476,14 @@ if not Server then
 end
 
 function Crag:GetGorgeOwner()
-    return self.ownerId ~= nil and self.ownerId ~= Entity.invalidId
+    return self.gorge
 end
 function Crag:GetDigestDuration()
     return kDigestDuration
 end
 
 function Crag:GetCanDigest(player)
-    return player == self:GetOwner() and player:isa("Gorge") and (not HasMixin(self, "Live") or self:GetIsAlive()) --and self:GetIsBuilt()
+    return self.gorge and player == self:GetOwner() and player:isa("Gorge") and (not HasMixin(self, "Live") or self:GetIsAlive()) --and self:GetIsBuilt()
 end
 
 -- CQ: Predates Mixins, somewhat hackish
@@ -484,39 +492,65 @@ function Crag:GetCanBeUsed(player, useSuccessTable)
 end
 
 function Crag:GetCanBeUsedConstructed()
-    return true
+    return self.gorge
 end
 
 function Crag:GetCanTeleportOverride()
-    return false --not self:GetGorgeOwner()
+    return not self.gorge
 end
 
 function Crag:GetCanConsumeOverride()
-    --Print( not self:GetGorgeOwner())
-    return false -- not self:GetGorgeOwner()
+    return not self.gorge
 end
 
-function Crag:GetCanRelocate()
-    return false-- not self:GetGorgeOwner()
-end
-
-function Crag:GetCanTeleport()
-    return false --not self:GetGorgeOwner()
-end
 
 function Crag:GetCanReposition()
-    return false -- not self:GetGorgeOwner()
+    if self.gorge then
+        return false
+    else
+        return true
+    end
 end
 
-function Crag:GetCanConsume()
-    return false
-    --local canConsume = true
-    --
-    --if self.GetCanConsumeOverride then
-    --    canConsume = self:GetCanConsumeOverride()
-    --end
-    --
-    --return canConsume and not self:GetConsumeActive()
+
+function Crag:OnOverrideOrder(order)
+    if self.gorge then
+        order:SetType(kTechId.Default)
+    elseif order:GetType() == kTechId.Default then
+        order:SetType(kTechId.Move)
+    end
+end
+
+function Crag:EnableGorgeOwner()
+    self.gorge = true
+end
+
+function Crag:GetUnitNameOverride(viewer)
+    
+    local unitName = GetDisplayName(self)
+    
+    if self.gorge and not GetAreEnemies(self, viewer) and self.ownerId then
+        local ownerName
+        for _, playerInfo in ientitylist(Shared.GetEntitiesWithClassname("PlayerInfoEntity")) do
+            if playerInfo.playerId == self.ownerId then
+                ownerName = playerInfo.playerName
+                break
+            end
+        end
+        if ownerName then
+            
+            local lastLetter = ownerName:sub(-1)
+            if lastLetter == "s" or lastLetter == "S" then
+                return string.format( "%s' Crag", ownerName )
+            else
+                return string.format( "%s's Crag", ownerName )
+            end
+        end
+    
+    end
+    
+    return unitName
 
 end
+
 Shared.LinkClassToMap("Crag", Crag.kMapName, networkVars)

@@ -1,2 +1,11 @@
 kGorgeTunnelCost = 1
+kGorgeTunnelCostDigest = 1
+kGorgeWhipCost = 1
+kGorgeWhipCostDigest = 1
+kGorgeCragCost = 1
+kGorgeCragCostDigest = 1
+kGorgeShiftCost = 1
+kGorgeShiftCostDigest = 1
+kGorgeShadeCost = 1
+kGorgeShadeCostDigest = 1
 -- kGorgeTunnelBuildTime = 18.5

@@ -14,7 +14,6 @@
 --
 -- ========= For more information, visit us at http://www.unknownworlds.com =====================
 
-Script.Load("lua/OwnerMixin.lua")
 Script.Load("lua/CommAbilities/Alien/ShiftEcho.lua")
 Script.Load("lua/Mixins/ModelMixin.lua")
 Script.Load("lua/LiveMixin.lua")
@@ -101,7 +100,8 @@ local networkVars =
     eggInRange = "boolean",
     harvesterInRange = "boolean",
     echoActive = "boolean",
-    
+
+    gorge = "boolean",
     moving = "boolean",
     ownerId = "entityid"
 }
@@ -270,7 +270,6 @@ function Shift:OnCreate()
     
     if Server then
     
-        InitMixin(self, OwnerMixin)
         InitMixin(self, InfestationTrackerMixin)
         self.remainingFindEggSpotAttempts = 300
         self.eggSpots = {}
@@ -283,6 +282,7 @@ function Shift:OnCreate()
     self:SetPhysicsType(PhysicsType.Kinematic)
     self:SetPhysicsGroup(PhysicsGroup.MediumStructuresGroup)
     
+    self.gorge = false
     self.echoActive = false
     self.timeLastEcho = 0
     
@@ -411,11 +411,6 @@ function Shift:GetTechAllowed(techId, techNode, player)
     
 end
 
-
-function Shift:GetCanReposition()
-    return true
-end
-
 function Shift:GetTechButtons(techId)
 
     local techButtons
@@ -435,10 +430,15 @@ function Shift:GetTechButtons(techId)
         end
 
     else
-
-        techButtons = { kTechId.ShiftEcho, kTechId.Move, kTechId.ShiftEnergize, kTechId.None, 
-                        kTechId.None, kTechId.None, kTechId.None, kTechId.Consume }
-                        
+    
+        if self:GetGorgeOwner() then
+            techButtons = { kTechId.ShiftEcho, kTechId.None, kTechId.ShiftEnergize, kTechId.None,
+                            kTechId.None, kTechId.None, kTechId.None, kTechId.None }
+        else
+            techButtons = { kTechId.ShiftEcho, kTechId.Move, kTechId.ShiftEnergize, kTechId.None,
+                            kTechId.None, kTechId.None, kTechId.None, kTechId.Consume }
+        end
+    
         if self.moving then
             techButtons[2] = kTechId.Stop
         end
@@ -654,20 +654,33 @@ function GetShiftHatchGhostGuides(commander)
 
 end
 
+
 if not Server then
     function Shift:GetOwner()
         return self.ownerId ~= nil and Shared.GetEntity(self.ownerId)
     end
 end
 
-function Crag:GetGorgeOwner()
-    return self.ownerId ~= nil and self.ownerId ~= Entity.invalidId
+function Shift:OnDestroy()
+    AlienStructure.OnDestroy(self)
+    if Server then
+        if self.gorge and self.consumed then
+            player = self:GetOwner()
+            if player then
+                player:AddResources(kGorgeShiftCostDigest)
+            end
+        end
+    end
+end
+function Shift:GetGorgeOwner()
+    return self.gorge
 end
 function Shift:GetDigestDuration()
     return kDigestDuration
 end
+
 function Shift:GetCanDigest(player)
-    return player == self:GetOwner() and player:isa("Gorge") and (not HasMixin(self, "Live") or self:GetIsAlive()) --and self:GetIsBuilt()
+    return self.gorge and player == self:GetOwner() and player:isa("Gorge") and (not HasMixin(self, "Live") or self:GetIsAlive()) --and self:GetIsBuilt()
 end
 
 -- CQ: Predates Mixins, somewhat hackish
@@ -676,26 +689,65 @@ function Shift:GetCanBeUsed(player, useSuccessTable)
 end
 
 function Shift:GetCanBeUsedConstructed()
-    return true
+    return self.gorge
 end
 
 function Shift:GetCanTeleportOverride()
-    return not self:GetOwner()
+    return not self.gorge
 end
 
 function Shift:GetCanConsumeOverride()
-    return not self:GetOwner()
+    return not self.gorge
 end
 
-function Shift:GetCanRelocate()
-    return not self:GetOwner()
+
+function Shift:GetCanReposition()
+    if self.gorge then
+        return false
+    else
+        return true
+    end
 end
 
-function Crag:GetCanTeleport()
-    return not self:GetGorgeOwner()
+
+function Shift:OnOverrideOrder(order)
+    if self.gorge then
+        order:SetType(kTechId.Default)
+    elseif order:GetType() == kTechId.Default then
+        order:SetType(kTechId.Move)
+    end
 end
 
-function Crag:GetCanReposition()
-    return not self:GetGorgeOwner()
+function Shift:EnableGorgeOwner()
+    self.gorge = true
 end
+
+function Shift:GetUnitNameOverride(viewer)
+    
+    local unitName = GetDisplayName(self)
+    
+    if self.gorge and not GetAreEnemies(self, viewer) and self.ownerId then
+        local ownerName
+        for _, playerInfo in ientitylist(Shared.GetEntitiesWithClassname("PlayerInfoEntity")) do
+            if playerInfo.playerId == self.ownerId then
+                ownerName = playerInfo.playerName
+                break
+            end
+        end
+        if ownerName then
+            
+            local lastLetter = ownerName:sub(-1)
+            if lastLetter == "s" or lastLetter == "S" then
+                return string.format( "%s' Shift", ownerName )
+            else
+                return string.format( "%s's Shift", ownerName )
+            end
+        end
+    
+    end
+    
+    return unitName
+
+end
+
 Shared.LinkClassToMap("Shift", Shift.kMapName, networkVars)

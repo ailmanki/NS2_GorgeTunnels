@@ -275,7 +275,9 @@ function DropStructureAbility:DropStructure(player, origin, direction, structure
             if structure then
 
                 structure:SetOwner(player)
-
+                if structure.EnableGorgeOwner then
+                    structure:EnableGorgeOwner()
+                end
                 if HasMixin(structure, "ClogFall") then
                     if onEntity then
                         if onEntity:isa("Clog") then

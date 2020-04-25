@@ -21,7 +21,6 @@
 --
 -- ========= For more information, visit us at http://www.unknownworlds.com =====================
 
-Script.Load("lua/OwnerMixin.lua")
 Script.Load("lua/Mixins/ClientModelMixin.lua")
 Script.Load("lua/LiveMixin.lua")
 Script.Load("lua/UpgradableMixin.lua")
@@ -83,7 +82,8 @@ Shade.kCloakUpdateRate = 0.2
 
 Shade.kMoveSpeed = 2.5
 
-local networkVars = { 
+local networkVars = {
+    gorge = "boolean",
     moving = "boolean",
     ownerId = "entityid"
 }
@@ -150,7 +150,6 @@ function Shade:OnCreate()
     
     if Server then
     
-        InitMixin(self, OwnerMixin)
         --InitMixin(self, TriggerMixin, {kPhysicsGroup = PhysicsGroup.TriggerGroup, kFilterMask = PhysicsMask.AllButTriggers} )
         InitMixin(self, InfestationTrackerMixin)
     elseif Client then
@@ -161,6 +160,7 @@ function Shade:OnCreate()
     self:SetPhysicsType(PhysicsType.Kinematic)
     self:SetPhysicsGroup(PhysicsGroup.MediumStructuresGroup)
     
+    self.gorge = false
 end
 
 function Shade:OnInitialized()
@@ -223,10 +223,27 @@ function Shade:GetCanDie(byDeathTrigger)
     return not byDeathTrigger
 end
 
-function Shade:GetTechButtons(techId)
+function Shade:OnDestroy()
+    AlienStructure.OnDestroy(self)
+    if Server then
+        if self.gorge and self.consumed then
+            player = self:GetOwner()
+            if player then
+                player:AddResources(kGorgeShadeCostDigest)
+            end
+        end
+    end
+end
 
-    local techButtons = { kTechId.ShadeInk, kTechId.Move, kTechId.ShadeCloak, kTechId.None, 
-                          kTechId.None, kTechId.None, kTechId.None, kTechId.Consume }
+function Shade:GetTechButtons(techId)
+    local techButtons
+    if self:GetGorgeOwner() then
+        techButtons = { kTechId.ShadeInk, kTechId.None, kTechId.ShadeCloak, kTechId.None,
+                        kTechId.None, kTechId.None, kTechId.None, kTechId.None }
+    else
+        techButtons = { kTechId.ShadeInk, kTechId.Move, kTechId.ShadeCloak, kTechId.None,
+                        kTechId.None, kTechId.None, kTechId.None, kTechId.Consume }
+    end
                           
     if self.moving then
         techButtons[2] = kTechId.Stop
@@ -305,10 +322,6 @@ function Shade:OnTeleportEnd()
     self:ResetPathing()
 end
 
-function Shade:GetCanReposition()
-    return true
-end
-
 if Server then
 
     function Shade:OnConstructionComplete()
@@ -362,6 +375,7 @@ function Shade:GetTechAllowed(techId, techNode, player)
     
 end
 
+
 if not Server then
     function Shade:GetOwner()
         return self.ownerId ~= nil and Shared.GetEntity(self.ownerId)
@@ -369,13 +383,14 @@ if not Server then
 end
 
 function Shade:GetGorgeOwner()
-    return self.ownerId ~= nil and self.ownerId ~= Entity.invalidId
+    return self.gorge
 end
 function Shade:GetDigestDuration()
     return kDigestDuration
 end
+
 function Shade:GetCanDigest(player)
-    return player == self:GetOwner() and player:isa("Gorge") and (not HasMixin(self, "Live") or self:GetIsAlive()) --and self:GetIsBuilt()
+    return self.gorge and player == self:GetOwner() and player:isa("Gorge") and (not HasMixin(self, "Live") or self:GetIsAlive()) --and self:GetIsBuilt()
 end
 
 -- CQ: Predates Mixins, somewhat hackish
@@ -384,24 +399,67 @@ function Shade:GetCanBeUsed(player, useSuccessTable)
 end
 
 function Shade:GetCanBeUsedConstructed()
-    return true
+    return self.gorge
 end
 
 function Shade:GetCanTeleportOverride()
-    return not self:GetGorgeOwner()
-end
-function Shade:GetCanConsumeOverride()
-    return not self:GetGorgeOwner()
-end
-function Shade:GetCanRelocate()
-    return not self:GetGorgeOwner()
+    return not self.gorge
 end
 
-function Shade:GetCanTeleport()
-    return not self:GetGorgeOwner()
+function Shade:GetCanConsumeOverride()
+    return not self.gorge
 end
+
+
 function Shade:GetCanReposition()
-    return not self:GetGorgeOwner()
+    if self.gorge then
+        return false
+    else
+        return true
+    end
+end
+
+
+function Shade:OnOverrideOrder(order)
+    Print("OnOverrideOrder %s", self.gorge)
+    
+    if self.gorge then
+        order:SetType(kTechId.Default)
+    elseif order:GetType() == kTechId.Default then
+        order:SetType(kTechId.Move)
+    end
+end
+
+function Shade:EnableGorgeOwner()
+    self.gorge = true
+end
+
+function Shade:GetUnitNameOverride(viewer)
+    
+    local unitName = GetDisplayName(self)
+    
+    if self.gorge and not GetAreEnemies(self, viewer) and self.ownerId then
+        local ownerName
+        for _, playerInfo in ientitylist(Shared.GetEntitiesWithClassname("PlayerInfoEntity")) do
+            if playerInfo.playerId == self.ownerId then
+                ownerName = playerInfo.playerName
+                break
+            end
+        end
+        if ownerName then
+            
+            local lastLetter = ownerName:sub(-1)
+            if lastLetter == "s" or lastLetter == "S" then
+                return string.format( "%s' Shade", ownerName )
+            else
+                return string.format( "%s's Shade", ownerName )
+            end
+        end
+    
+    end
+    
+    return unitName
+
 end
 
 Shared.LinkClassToMap("Shade", Shade.kMapName, networkVars)

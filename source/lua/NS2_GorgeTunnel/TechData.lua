@@ -2567,7 +2567,7 @@ function BuildTechData()
             [kTechDataGhostModelClass] = "AlienGhostModel",
             [kTechDataMapName] = Crag.kMapName,
             [kTechDataDisplayName] = "CRAG",
-            [kTechDataCostKey] = kGorgeCraqCost,
+            [kTechDataCostKey] = kGorgeCragCost,
             [kTechDataRequiresInfestation] = true,
             [kTechDataHotkey] = Move.C,
             [kTechDataBuildTime] = kCragBuildTime,

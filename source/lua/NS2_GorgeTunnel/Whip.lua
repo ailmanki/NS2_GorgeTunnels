@@ -36,7 +36,6 @@ Script.Load("lua/AlienStructureMoveMixin.lua")
 Script.Load("lua/ConsumeMixin.lua")
 Script.Load("lua/DigestMixin.lua")
 -- Gorge owner
---Script.Load("lua/OwnerMixin.lua")
 
 local kDigestDuration = 1.5
 
@@ -80,6 +79,7 @@ local networkVars =
         -- used for rooting/unrooting
         unblockTime = "time",
 
+        gorge = "boolean",
          ownerId = "entityid",
     }
 
@@ -122,13 +122,13 @@ function Whip:OnCreate()
     self.moving = false
     self.move_speed = 0
     self.unblockTime = 0
-
+    
     -- to prevent collision with whip bombs
     self:SetPhysicsGroup(PhysicsGroup.WhipGroup)
     self:SetUpdates(true, kRealTimeUpdateRate)
     
     if Server then
-       -- InitMixin(self, OwnerMixin)
+
         self.targetId = Entity.invalidId
         self.nextAttackTime = 0
         
@@ -157,6 +157,7 @@ function Whip:OnInitialized()
 
     self.nextSlapStartTime    = 0
     self.nextBombardStartTime = 0
+    self.gorge = false
     
 end
 
@@ -164,8 +165,13 @@ end
 function Whip:OnDestroy()
 
     AlienStructure.OnDestroy(self)
-    
     if Server then
+        if self.gorge and self.consumed then
+            player = self:GetOwner()
+            if player then
+                player:AddResources(kGorgeWhipCostDigest)
+            end
+        end
         self.movingSound = nil
     end
     
@@ -181,10 +187,6 @@ function Whip:GetMaxSpeed()
     return Whip.kMoveSpeed
 end
 
--- ---  RepositionMixin
-function Whip:GetCanReposition()
-    return self:GetIsBuilt()
-end
 
 function Whip:OverrideRepositioningSpeed()
     return Whip.kMoveSpeed
@@ -329,9 +331,15 @@ end
 -- --- Commander interface
 
 function Whip:GetTechButtons(techId)
-
-    local techButtons = { kTechId.Slap, kTechId.Move, kTechId.None, kTechId.None,
-                    kTechId.None, kTechId.None, kTechId.None, kTechId.Consume }
+    local techButtons
+    if self:GetGorgeOwner() then
+        techButtons = { kTechId.Slap, kTechId.None, kTechId.None, kTechId.None,
+                        kTechId.None, kTechId.None, kTechId.None, kTechId.None }
+    else
+        techButtons = { kTechId.Slap, kTechId.Move, kTechId.None, kTechId.None,
+                        kTechId.None, kTechId.None, kTechId.None, kTechId.Consume }
+    end
+    
     
     if self:GetIsMature() then
         techButtons[1] = kTechId.WhipBombard
@@ -419,37 +427,87 @@ if Client then
 
 end
 
-function Whip:GetGorgeOwner()
-    return self.ownerId ~= nil and self.ownerId ~= Entity.invalidId
-end
-function Whip:GetCanBeUsedConstructed()
-    return true
-end
 if not Server then
     function Whip:GetOwner()
         return self.ownerId ~= nil and Shared.GetEntity(self.ownerId)
     end
 end
+
+function Whip:GetGorgeOwner()
+    return self.gorge
+end
 function Whip:GetDigestDuration()
     return kDigestDuration
 end
+
 function Whip:GetCanDigest(player)
-    return player == self:GetOwner() and player:isa("Gorge") and (not HasMixin(self, "Live") or self:GetIsAlive()) --and self:GetIsBuilt()
+    return self.gorge and player == self:GetOwner() and player:isa("Gorge") and (not HasMixin(self, "Live") or self:GetIsAlive()) --and self:GetIsBuilt()
+end
+
+-- CQ: Predates Mixins, somewhat hackish
+function Whip:GetCanBeUsed(player, useSuccessTable)
+    useSuccessTable.useSuccess = useSuccessTable.useSuccess and self:GetCanDigest(player)
+end
+
+function Whip:GetCanBeUsedConstructed()
+    return self.gorge
 end
 
 function Whip:GetCanTeleportOverride()
-    return not self:GetGorgeOwner()
+    return not self.gorge
 end
 
 function Whip:GetCanConsumeOverride()
-    return not self:GetGorgeOwner()
+    return not self.gorge
 end
 
-function Whip:GetCanRelocate()
-    return not self:GetGorgeOwner()
-end
 
 function Whip:GetCanReposition()
-    return not self:GetGorgeOwner()
+    if self.gorge then
+        return false
+    else
+        return true and self:GetIsBuilt()
+    end
+end
+
+
+function Whip:OnOverrideOrder(order)
+    if self.gorge then
+        order:SetType(kTechId.Default)
+    elseif order:GetType() == kTechId.Default then
+        order:SetType(kTechId.Move)
+    end
+end
+
+function Whip:EnableGorgeOwner()
+    self.gorge = true
+end
+
+function Whip:GetUnitNameOverride(viewer)
+    
+    local unitName = GetDisplayName(self)
+    
+    if self.gorge and not GetAreEnemies(self, viewer) and self.ownerId then
+        local ownerName
+        for _, playerInfo in ientitylist(Shared.GetEntitiesWithClassname("PlayerInfoEntity")) do
+            if playerInfo.playerId == self.ownerId then
+                ownerName = playerInfo.playerName
+                break
+            end
+        end
+        if ownerName then
+            
+            local lastLetter = ownerName:sub(-1)
+            if lastLetter == "s" or lastLetter == "S" then
+                return string.format( "%s' Whip", ownerName )
+            else
+                return string.format( "%s's Whip", ownerName )
+            end
+        end
+    
+    end
+    
+    return unitName
+
 end
 Shared.LinkClassToMap("Whip", Whip.kMapName, networkVars, true)

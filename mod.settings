@@ -1,32 +1,15 @@
-name        = "Gorge Enhanced"
+name        = "Gorge Toys"
 source_dir  = "source"
 output_dir  = "output"
-description = [=[Brings toys for the Gorge!
-
-Gorge can now not only drop a tunnel, but also whips, crags, shifts and shade.
-
-
-Includes Gorge Tunnel!
-Commander can drop tunnels just like in vanilla, in addition he can upgrade a Gorge Tunnel to an Infested Tunnel.
-- Costs 5 res per entrance.
-- In combat mod a entrance costs 1 point.
-
-
-History
-In 2013 Gorge Tunnels where add to NS2, with the [url=unknownworlds.com/ns2/gorgeous-changelog] Gorgeous Update [/url].
-Six years later in 2019 [url=unknownworlds.com/ns2/build-327-balance-patch-notes/] Build 327 [/url] moved Gorge Tunnels to the commander.
-
-
-Thanks to
-- the creators of NS2 for the original Gorge Tunnels!
-- spawnof2000 for testing with me!
-- Muse for creating a lovely preview picture!
-- neo for pressuring me to make Gorge Tunnels happen!
-- all players on Wooza for live testing and chitchat!
-
-
-ModID
-]=]
+description = [=[Brings toys for the Gorge!
+
+Gorge can now not only drop a tunnel, but also whips, crags, shifts and shade.
+
+Includes [url=steamcommunity.com/sharedfiles/filedetails/?id=2057535828] Gorge Tunnel [/url] !
+
+
+ModID: 7B9B0165]=]
 image       = "preview.jpg"
 tag_modtype = "Gameplay Tweak"
 tag_support = "Must be run on Server"
+publish_id = "7b9b0165"

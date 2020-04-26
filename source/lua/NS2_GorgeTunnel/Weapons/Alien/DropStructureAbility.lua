@@ -451,7 +451,7 @@ function DropStructureAbility:GetPositionForStructure(startPosition, direction, 
     local requiresInfestation = LookupTechData(structureAbility.GetDropStructureId(), kTechDataRequiresInfestation)
     if requiresInfestation and not GetIsPointOnInfestation(displayOrigin) then
 
-        if self:GetActiveStructure().OverrideInfestationCheck then
+        if self:GetActiveStructure() ~= nil and self:GetActiveStructure().OverrideInfestationCheck then
             validPosition = self:GetActiveStructure():OverrideInfestationCheck(trace)
         else
             validPosition = false

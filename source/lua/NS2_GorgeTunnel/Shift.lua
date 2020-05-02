@@ -608,10 +608,30 @@ if Server then
         if table.icontains(self.shiftEggs, oldId) then
             table.removevalue(self.shiftEggs, oldId)
         end
-        
     end
-
+    
+    function Shift:OnKill(attacker, doer, point, direction)
+        
+        ScriptActor.OnKill(self, attacker, doer, point, direction)
+        
+        local team = self:GetTeam()
+        if team then
+            team:UpdateClientOwnedStructures(self:GetId())
+        end
+    
+        if self.gorge then
+            player = self:GetOwner()
+            if player then
+                if (self.consumed) then
+                    player:AddResources(kGorgeShiftCostDigest)
+                else
+                    player:AddResources(kGorgeShiftCostKill)
+                end
+            end
+        end
+    end
 end
+
 
 function GetShiftIsBuilt(techId, origin, normal, commander)
 
@@ -661,17 +681,6 @@ if not Server then
     end
 end
 
-function Shift:OnDestroy()
-    AlienStructure.OnDestroy(self)
-    if Server then
-        if self.gorge and self.consumed then
-            player = self:GetOwner()
-            if player then
-                player:AddResources(kGorgeShiftCostDigest)
-            end
-        end
-    end
-end
 function Shift:GetGorgeOwner()
     return self.gorge
 end

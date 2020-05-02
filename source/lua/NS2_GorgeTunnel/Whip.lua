@@ -166,10 +166,14 @@ function Whip:OnDestroy()
 
     AlienStructure.OnDestroy(self)
     if Server then
-        if self.gorge and self.consumed then
+        if self.gorge then
             player = self:GetOwner()
             if player then
-                player:AddResources(kGorgeWhipCostDigest)
+                if (self.consumed) then
+                    player:AddResources(kGorgeWhipCostDigest)
+                else
+                    player:AddResources(kGorgeWhipCostKill)
+                end
             end
         end
         self.movingSound = nil

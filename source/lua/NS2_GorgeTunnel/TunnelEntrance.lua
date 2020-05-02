@@ -818,7 +818,18 @@ if Server then
         -- We need to wait for infestation to recede before we can actually destroy
         -- the entity.
         self:AddTimedCallback(TunnelEntrance.UpdateDestruction, kUpdateDestructionInterval)
+      
+        if self:GetGorgeOwner() then
+            player = self:GetOwner()
+            if player then
+                if (self.consumed) then
+                    player:AddResources(kGorgeTunnelCostDigest)
+                else
+                    player:AddResources(kGorgeTunnelCostKill)
+                end
         
+            end
+        end
     end
     
     function TunnelEntrance:KillWithoutCollapse()

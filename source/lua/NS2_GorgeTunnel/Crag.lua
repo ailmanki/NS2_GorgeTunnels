@@ -215,10 +215,14 @@ end
 function Crag:OnDestroy()
     AlienStructure.OnDestroy(self)
     if Server then
-        if self.gorge and self.consumed then
+        if self.gorge then
             player = self:GetOwner()
             if player then
-                player:AddResources(kGorgeCragCostDigest)
+                if (self.consumed) then
+                    player:AddResources(kGorgeCragCostDigest)
+                else
+                    player:AddResources(kGorgeCragCostKill)
+                end
             end
         end
     end

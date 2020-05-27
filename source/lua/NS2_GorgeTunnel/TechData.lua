@@ -4498,6 +4498,8 @@ end
 -- third parameter to use as default if not found.
 function LookupTechData(techId, fieldName, default)
 
+    PROFILE("LookupTechData")
+    
     -- Initialize table if necessary
     if not kTechData then
         kTechData = BuildTechData()

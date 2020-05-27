@@ -75,6 +75,11 @@ end
 
 function AlienTeam:OnResetComplete()
 
+    --adjust first power node
+    local initialTechPoint = self:GetInitialTechPoint()
+    local locationName = initialTechPoint:GetLocationName()
+    DestroyPowerForLocation(locationName, true)
+
     local commander = self:GetCommander()
     local gameInfo = GetGameInfoEntity()
     

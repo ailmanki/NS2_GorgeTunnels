@@ -378,8 +378,8 @@ function GetTeamHasCommander(teamNumber)
 
     if Client then
 
-        local commTable = ScoreboardUI_GetOrderedCommanderNames(teamNumber)
-        return #commTable > 0
+        local commName = ScoreboardUI_GetCommanderName(teamNumber)
+        return commName ~= nil
 
     elseif Server then
         return #GetEntitiesForTeam("Commander", teamNumber) ~= 0
@@ -1206,7 +1206,7 @@ function GetNearest(origin, className, teamNumber, filterFunc)
 
             if teamNumber == nil or (teamNumber == ent:GetTeamNumber()) then
 
-                local distance = (ent:GetOrigin() - origin):GetLength()
+                local distance = (ent:GetOrigin() - origin):GetLengthSquared()
                 if nearest == nil or distance < nearestDistance then
 
                     nearest = ent
@@ -1360,17 +1360,10 @@ function GetPowerPointForLocation(locationName)
     local locationId = Shared.GetStringIndex(locationName)
 
     local powerPoints = Shared.GetEntitiesWithClassname("PowerPoint")
-    for p = 1, powerPoints:GetSize() do
-
-        local powerPoint = powerPoints:GetEntityAtIndex(p - 1)
-        if powerPoint then
-
+    for _, powerPoint in ientitylist(powerPoints) do
             if powerPoint:GetLocationId() == locationId then
                 return powerPoint
             end
-
-        end
-
     end
 
     return nil
@@ -1447,7 +1440,6 @@ function GetReflectionProbesForLocation(locationName)
 
     for _, locationTransform in ipairs(locationTransforms) do
 
-        -- TEMP FIX FOR SCRIPT ERRORS
         if Client.reflectionProbeList then
             for _, probe in ipairs(Client.reflectionProbeList) do
 
@@ -1471,7 +1463,6 @@ function GetReflectionProbesForLocation(locationName)
 
     end
 
-    -- Log("Total lights %s, lights in %s = %s", #Client.lightList, locationName, #lightList)
     probeLocationCache[locationName] = probeList
 
     return probeList
@@ -1990,10 +1981,7 @@ function GetSelectionText(entity, teamNumber)
         local techId = entity:GetTechId()
 
         local secondaryText = ""
-        if entity:isa("PowerPoint") and not entity:GetIsBuilt() and entity.buildFraction == 1 then
-            secondaryText = Locale.ResolveString("CONSTRUCT_PRIMED")
-
-        elseif HasMixin(entity, "Construct") and not entity:GetIsBuilt() then
+        if HasMixin(entity, "Construct") and not entity:GetIsBuilt() then
             secondaryText = Locale.ResolveString("CONSTRUCT_UNBUILT")
 
         elseif HasMixin(entity, "PowerConsumer") and entity:GetRequiresPower() and not entity:GetIsPowered() then
@@ -2077,7 +2065,7 @@ end
 local allowedWarmUpStrcutures = {
     "Hydra",
     "Clog",
-    "TunnelEntrance",
+    "TunnelEntrance"
 }
 function GetValidTargetInWarmUp(target)
 
@@ -3170,21 +3158,15 @@ function ValidateShoulderPad( variants )
 end
 
 function ValidateVariant( variants, variantType, enum, enumData )
-    --Log("-ValidateVariant()-")
-    --Log("\tvariants=%s", variants)
-    --Log("\variantType=%s", variantType)
-    --Log("\tenum=%s", enum)
-    --Log("\tenumData=%s", enum)
-    
     local idx = Client.GetOptionInteger(variantType, 1)
-    --Log("\t  idx=%d", idx)
+    local pvIdx = idx --cache incase not owned, for logging
     if not rawget( enum, idx ) then -- if it's an invalid id
         Client.SetOptionInteger(variantType, 1) -- fix it
         idx = 1
         HPrint( "Invalid ID on "..variantType )
     elseif not GetHasVariant( enumData, idx ) then -- if they don't have access to this
         idx = 1 -- don't let them use it
-        HPrint( "No access to "..variantType.." "..idx )
+        HPrint( "No access to " .. variantType .. " " .. pvIdx )
     end
 
     variants[variantType] = idx
@@ -3266,147 +3248,6 @@ function CheckCollectableAchievement()
     end
 end
 
-function InventoryNewItemNotifyPush( item )
-    --Log("InventoryNewItemNotifyPush( %s )", item)
-    local new = json.decode( Client.GetOptionString("inventory_new","[]") ) or {}
-    new[#new+1] = item
-    Client.SetOptionString("inventory_new", json.encode( new ) )
-    
-    local menu = GetMainMenu()
-    if menu and not menu:GetIsInGame() then
-        --Log("\t menu:CheckForNewNotifications()...")
-        menu:CheckForNewNotifications()
-    end
-end
-
-function InventoryNewItemNotifyPop()
-    local new = json.decode( Client.GetOptionString("inventory_new","[]") ) or {}
-    local pop = new[1]
-    for i=2,#new do new[i-1] = new[i] end
-    new[#new] = nil
-    Client.SetOptionString("inventory_new", json.encode( new ) )
-    return pop
-end
-
-function InventoryNewItemHandler( item, isDupe )
-    --Log("InventoryNewItemHandler( %s, %s )", item, isDupe)
-    if Client.IsInventoryLoaded() and not isDupe then
-        --Log("\t Inv loaded, run notifications...")
-        InventoryNewItemNotifyPush( item )
-        CheckCollectableAchievement()
-        --GetCustomizeScreen():UpdateBuyButton(item, true)
-    end
-end
-Event.Hook("InventoryNewItem", InventoryNewItemHandler )
-
-local function OnInventoryUpdated()
-    --Log("OnInventoryUpdated()")
-    --SendPlayerVariantUpdate()
-
-    local menu = GetMainMenu()
-    if menu and Client.IsInventoryLoaded() then
-        --Log("\t Menu and Inventory loaded, refreshing owned items...")
-        GetCustomizeScene():RefreshOwnedItems()
-    end
-end
-Event.Hook("InventoryUpdated", OnInventoryUpdated)
-
-Event.Hook("Console_forceitemsupdate", function() Client.UpdateInventory() end)
-
-local kCurrencyCodeSymbols =
-{
-    ["AED"] = "د.إ",
-    ["ARS"] = "$",
-    ["AUD"] = "$",
-    ["BRL"] = "R$",
-    ["CAD"] = "$",
-    ["CHF"] = "₣",
-    ["CLP"] = "$",
-    ["CNY"] = "¥",
-    ["COP"] = "$",
-    ["CRC"] = "₡",
-    ["EUR"] = "€",
-    ["GBP"] = "£",
-    ["HKD"] = "$",
-    ["ILS"] = "₪",
-    ["IDR"] = "Rp",
-    ["INR"] = "₹",
-    ["JPY"] = "¥",
-    ["KRW"] = "₩",
-    ["KWD"] = "د.ك",
-    ["KZT"] = "〒",
-    ["MXN"] = "$",
-    ["MYR"] = "RM",
-    ["NOK"] = "kr",
-    ["NZD"] = "$",
-    ["PEN"] = "S/.",
-    ["PHP"] = "₱",
-    ["PLN"] = "zł",
-    ["QAR"] = "ر.ق",
-    ["RUB"] = "р.",
-    ["SAR"] = "ر.س",
-    ["SGD"] = "$",
-    ["THB"] = "฿",
-    ["TRY"] = "₤",
-    ["TWD"] = "$",
-    ["UAH"] = "₴",
-    ["USD"] = "$",
-    ["UYU"] = "$",
-    ["VND"] = "₫",
-    ["ZAR"] = "R",
-}
-local kActiveCurrencySymbol = nil
-local kActiveCurrencyCodeOverride = nil
-function GetUserCurrencySymbol()
-    assert(Client)
-    local curCode = Client.GetCurrencyCode()
-    if curCode and string.len(curCode) > 0 and kCurrencyCodeSymbols[curCode] then
-        if kActiveCurrencySymbol == nil then
-            kActiveCurrencySymbol = kCurrencyCodeSymbols[curCode]
-        end
-
-        if kActiveCurrencyCodeOverride ~= nil then
-            return kCurrencyCodeSymbols[kActiveCurrencyCodeOverride]
-        end
-
-        return kActiveCurrencySymbol
-    else
-        Log("Invalid currency code [%s] fetched!", curCode)
-    end
-end
-
-local OverrideCurrencyCode = function(newCode)
-    
-end
-
-local DumpCurrencyCodes = function()
-    Log(ToString(kCurrencyCodeSymbols))
-end
-Event.Hook("Console_dumpcurrencycodes", DumpCurrencyCodes)
-
---TODO Handle prices for speicifc cur-codes (e.g. New Taiwan Dollar, reported in fēn. Must be charged in increments of 100 fēn (e.g. 1000, not 1050).)
---See https://partner.steamgames.com/doc/store/pricing/currencies for details
-function GetFormattedPrice( price, currencyCode )
-    assert(price)
-    assert(currencyCode)
-    assert(type(price) == "number" and price > 0)
-    assert(type(currencyCode) == "string" and string.len(currencyCode) >= 2)
-
-    --FIXME Need per-currency code formatting of price
-    ----Lookup Table of functions that process data and return formatted string
-
-    --USD style formatting
-    local subAmt = string.sub(price, string.len(price) - 1, string.len(price))
-    local bAmt = string.sub(price, 1, string.len(price) - 2)
-    if string.len(bAmt) == 0 then
-    --Handle sub dollar amounts
-        bAmt = "0"
-    end
-    Log("\t bAmt: %s, subAmt: %s", bAmt, subAmt)
-    local priceStr = GetUserCurrencySymbol() .. bAmt .. "." .. subAmt
-    Log("\t Price: %s", priceStr)
-    return priceStr
-end
 
 ------------------------------------------
 --  This will return nil if the asset DNE
@@ -3453,12 +3294,12 @@ function GetPlayerSkillTier(skill, isRookie, adagradSum, isBot)
         end
     end
 
-    if skill < 551 then return 1, "SKILLTIER_RECRUIT", skill end
-    if skill < 1001 then return 2, "SKILLTIER_FRONTIERSMAN", skill end
-    if skill < 1601 then return 3, "SKILLTIER_SQUADLEADER", skill end
-    if skill < 2201 then return 4, "SKILLTIER_VETERAN", skill end
-    if skill < 3001 then return 5, "SKILLTIER_COMMANDANT", skill end
-    if skill < 4000 then return 6, "SKILLTIER_SPECIALOPS", skill end
+    if skill <= 300 then return 1, "SKILLTIER_RECRUIT", skill end
+    if skill <= 750 then return 2, "SKILLTIER_FRONTIERSMAN", skill end
+    if skill <= 1400 then return 3, "SKILLTIER_SQUADLEADER", skill end
+    if skill <= 2100 then return 4, "SKILLTIER_VETERAN", skill end
+    if skill <= 2900 then return 5, "SKILLTIER_COMMANDANT", skill end
+    if skill <= 4100 then return 6, "SKILLTIER_SPECIALOPS", skill end
     return 7, "SKILLTIER_SANJISURVIVOR", skill
 end
 

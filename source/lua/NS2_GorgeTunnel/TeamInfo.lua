@@ -367,7 +367,7 @@ end
 
 function TeamInfo:OnCommanderLogin( commanderPlayer, forced )
 
-    self.lastCommIsBot = commanderPlayer:GetClient():GetIsVirtual()
+    self.lastCommIsBot = commanderPlayer:GetIsVirtual()
 	if forced or GetGamerules():GetGameState() > kGameState.PreGame then
 		if self.lastCommLoginTime == 0 then
 			commanderPlayer:SetResources(0)

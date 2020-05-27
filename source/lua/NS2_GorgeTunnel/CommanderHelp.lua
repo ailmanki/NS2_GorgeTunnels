@@ -434,6 +434,7 @@ end
 
 -- #######################################################
 
+-- Todo: refactor this mess
 local function BuildCommanderHelpFunctions()
 
     gGetMarineCommanderHelp = {}

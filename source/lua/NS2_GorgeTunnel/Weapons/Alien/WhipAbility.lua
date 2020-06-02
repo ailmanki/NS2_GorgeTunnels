@@ -45,7 +45,7 @@ local function CalculateWhipPosition(position, player, normal)
         local extents = GetExtents(kTechId.Whip) / 2.25
         local traceStart = position + normal * 0.15 -- A bit above to allow whips to be placed on uneven ground easily
         local traceEnd = position + normal * extents.y
-        trace = Shared.TraceBox(extents, traceStart, traceEnd, CollisionRep.Damage, PhysicsMask.Bullets, EntityCalculateWhipFilter(player))
+        local trace = Shared.TraceBox(extents, traceStart, traceEnd, CollisionRep.Damage, PhysicsMask.Bullets, EntityCalculateWhipFilter(player))
 
         if trace.fraction ~= 1 then
             -- DebugTraceBox(extents, traceStart, traceEnd, 0.1, 45, 45, 45, 1)

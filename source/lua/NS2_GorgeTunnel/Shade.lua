@@ -227,7 +227,7 @@ function Shade:OnDestroy()
     AlienStructure.OnDestroy(self)
     if Server then
         if self.gorge then
-            player = self:GetOwner()
+            local player = self:GetOwner()
             if player then
                 if (self.consumed) then
                     player:AddResources(kGorgeShadeCostDigest)

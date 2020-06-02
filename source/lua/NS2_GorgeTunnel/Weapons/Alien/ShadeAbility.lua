@@ -45,7 +45,7 @@ local function CalculateShadePosition(position, player, normal)
         local extents = GetExtents(kTechId.Shade) / 2.25
         local traceStart = position + normal * 0.15 -- A bit above to allow shades to be placed on uneven ground easily
         local traceEnd = position + normal * extents.y
-        trace = Shared.TraceBox(extents, traceStart, traceEnd, CollisionRep.Damage, PhysicsMask.Bullets, EntityCalculateShadeFilter(player))
+        local trace = Shared.TraceBox(extents, traceStart, traceEnd, CollisionRep.Damage, PhysicsMask.Bullets, EntityCalculateShadeFilter(player))
 
         if trace.fraction ~= 1 then
             -- DebugTraceBox(extents, traceStart, traceEnd, 0.1, 45, 45, 45, 1)

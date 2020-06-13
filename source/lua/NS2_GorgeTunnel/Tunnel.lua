@@ -343,7 +343,7 @@ if Server then
         local exitId = exit:GetId()
         if self.exitAId == exitId then
             self.exitAEntityPosition = exit:GetOrigin()
-        elseif self.exitBId == exit:GetId() then
+        elseif self.exitBId == exitId then
             self.exitBEntityPosition = exit:GetOrigin()
         end
     

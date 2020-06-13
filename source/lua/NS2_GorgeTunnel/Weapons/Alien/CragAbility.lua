@@ -33,7 +33,7 @@ function CragStructureAbility:GetDropStructureId()
 end
 
 local function EntityCalculateCragFilter(entity)
-    return function (test) return EntityFilterOneAndIsa(entity, "Clog") or test:isa("Crag") end
+    return function (test) return EntityFilterOneAndIsa(entity, "Clog") or test:isa("GorgeCrag") end
 end
 
 local function CalculateCragPosition(position, player, normal)
@@ -42,7 +42,7 @@ local function CalculateCragPosition(position, player, normal)
 
 	local valid = true
     if valid then
-        local extents = GetExtents(kTechId.Crag) / 2.25
+        local extents = GetExtents(kTechId.GorgeCrag) / 2.25
         local traceStart = position + normal * 0.15 -- A bit above to allow crags to be placed on uneven ground easily
         local traceEnd = position + normal * extents.y
         local trace = Shared.TraceBox(extents, traceStart, traceEnd, CollisionRep.Damage, PhysicsMask.Bullets, EntityCalculateCragFilter(player))
@@ -66,13 +66,13 @@ function CragStructureAbility:GetIsPositionValid(position, player, surfaceNormal
 end
 
 function CragStructureAbility:GetSuffixName()
-    return "crag"
+    return "gorgecrag"
 end
 
 function CragStructureAbility:GetDropClassName()
-    return "Crag"
+    return "GorgeCrag"
 end
 
 function CragStructureAbility:GetDropMapName()
-    return Crag.kMapName
+    return GorgeCrag.kMapName
 end

@@ -33,7 +33,7 @@ function ShiftStructureAbility:GetDropStructureId()
 end
 
 local function EntityCalculateShiftFilter(entity)
-    return function (test) return EntityFilterOneAndIsa(entity, "Clog") or test:isa("Shift") end
+    return function (test) return EntityFilterOneAndIsa(entity, "Clog") or test:isa("GorgeShift") end
 end
 
 local function CalculateShiftPosition(position, player, normal)
@@ -42,7 +42,7 @@ local function CalculateShiftPosition(position, player, normal)
 
 	local valid = true
     if valid then
-        local extents = GetExtents(kTechId.Shift) / 2.25
+        local extents = GetExtents(kTechId.GorgeShift) / 2.25
         local traceStart = position + normal * 0.15 -- A bit above to allow shifts to be placed on uneven ground easily
         local traceEnd = position + normal * extents.y
         local trace = Shared.TraceBox(extents, traceStart, traceEnd, CollisionRep.Damage, PhysicsMask.Bullets, EntityCalculateShiftFilter(player))
@@ -66,13 +66,13 @@ function ShiftStructureAbility:GetIsPositionValid(position, player, surfaceNorma
 end
 
 function ShiftStructureAbility:GetSuffixName()
-    return "shift"
+    return "gorgeshift"
 end
 
 function ShiftStructureAbility:GetDropClassName()
-    return "Shift"
+    return "GorgeShift"
 end
 
 function ShiftStructureAbility:GetDropMapName()
-    return Shift.kMapName
+    return GorgeShift.kMapName
 end

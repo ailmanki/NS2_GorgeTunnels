@@ -14,4 +14,6 @@ kGorgeShadeCost = 10
 kGorgeShadeCostDigest = 6
 kGorgeShadeCostKill = 0
 
+--kGorgeStructuresPerHive = 3  --not used yet
+
 -- kGorgeTunnelBuildTime = 18.5

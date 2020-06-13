@@ -33,7 +33,7 @@ function WhipStructureAbility:GetDropStructureId()
 end
 
 local function EntityCalculateWhipFilter(entity)
-    return function (test) return EntityFilterOneAndIsa(entity, "Clog") or test:isa("Whip") end
+    return function (test) return EntityFilterOneAndIsa(entity, "Clog") or test:isa("GorgeWhip") end
 end
 
 local function CalculateWhipPosition(position, player, normal)
@@ -66,13 +66,13 @@ function WhipStructureAbility:GetIsPositionValid(position, player, surfaceNormal
 end
 
 function WhipStructureAbility:GetSuffixName()
-    return "whip"
+    return "gorgewhip"
 end
 
 function WhipStructureAbility:GetDropClassName()
-    return "Whip"
+    return "GorgeWhip"
 end
 
 function WhipStructureAbility:GetDropMapName()
-    return Whip.kMapName
+    return GorgeWhip.kMapName
 end

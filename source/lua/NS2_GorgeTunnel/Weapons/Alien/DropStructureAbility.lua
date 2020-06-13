@@ -71,6 +71,7 @@ function DropStructureAbility:OnCreate()
     self.lastClickedPosition = nil
     self.lastClickedPositionNormal = nil
 
+	self.timeNextUpdatedDropStructure = 0
 end
 
 function DropStructureAbility:GetDeathIconIndex()
@@ -267,18 +268,19 @@ function DropStructureAbility:DropStructure(player, origin, direction, structure
 
         valid = valid and self:GetNumStructuresBuilt(techId) ~= maxStructures -- -1 is unlimited
 
+		--Print("%s built %d  max %d", ToString(valid), self:GetNumStructuresBuilt(techId), maxStructures)
         local cost = LookupTechData(structureAbility:GetDropStructureId(), kTechDataCostKey, 0)
         local enoughRes = player:GetResources() >= cost
         local energyCost = structureAbility:GetEnergyCost()
         local enoughEnergy = player:GetEnergy() >= energyCost
 
         if valid and enoughRes and structureAbility:IsAllowed(player) and enoughEnergy and not self:GetHasDropCooldown() then
-
+			
             -- Create structure
             local structure = self:CreateStructure(coords, player, structureAbility)
 
             if structure then
-
+			
                 structure:SetOwner(player)
                 if structure.EnableGorgeOwner then
                     structure:EnableGorgeOwner()
@@ -541,47 +543,52 @@ end
 
 function DropStructureAbility:ProcessMoveOnWeapon(input)
 
-    -- Show ghost if we're able to create structure, and if menu is not visible
-    local player = self:GetParent()
-    if player then
+	if self.timeNextUpdatedDropStructure < Shared.GetTime() then
+		-- Show ghost if we're able to create structure, and if menu is not visible
+		self.timeNextUpdatedDropStructure = Shared.GetTime() + 0.5
+		
+		local player = self:GetParent()
+		if player then
 
-        if Server then
+			if Server then
 
-            local team = player:GetTeam()
-            local numAllowedHydras = LookupTechData(kTechId.Hydra, kTechDataMaxAmount, -1)
-            local numAllowedClogs = LookupTechData(kTechId.Clog, kTechDataMaxAmount, -1)
-            local numAllowedTunnels = LookupTechData(kTechId.GorgeTunnel, kTechDataMaxAmount, -1)
-            local numAllowedWebs = LookupTechData(kTechId.Web, kTechDataMaxAmount, -1)
-            local numAllowedBabblers = LookupTechData(kTechId.BabblerEgg, kTechDataMaxAmount, -1)
-            local numAllowedStructures = LookupTechData(kTechId.GorgeWhip, kTechDataMaxAmount, -1)
+				local team = player:GetTeam()
+				local numAllowedHydras = LookupTechData(kTechId.Hydra, kTechDataMaxAmount, -1)
+				local numAllowedClogs = LookupTechData(kTechId.Clog, kTechDataMaxAmount, -1)
+				local numAllowedTunnels = LookupTechData(kTechId.GorgeTunnel, kTechDataMaxAmount, -1)
+				local numAllowedWebs = LookupTechData(kTechId.Web, kTechDataMaxAmount, -1)
+				local numAllowedBabblers = LookupTechData(kTechId.BabblerEgg, kTechDataMaxAmount, -1)
+				local numAllowedStructures = LookupTechData(kTechId.GorgeWhip, kTechDataMaxAmount, -1)
 
-            if numAllowedHydras >= 0 then
-                self.numHydrasLeft = team:GetNumDroppedGorgeStructures(player, kTechId.Hydra)
-            end
+				--Print("max allowed "..ToString(numAllowedStructures))
+				if numAllowedHydras >= 0 then
+					self.numHydrasLeft = team:GetNumDroppedGorgeStructures(player, kTechId.Hydra)
+				end
 
-            if numAllowedClogs >= 0 then
-                self.numClogsLeft = team:GetNumDroppedGorgeStructures(player, kTechId.Clog)
-            end
-            
-            if numAllowedTunnels >= 0 then
-                self.numTunnelsLeft = team:GetNumDroppedGorgeStructures(player, kTechId.GorgeTunnel)
-            end
-            
-            if numAllowedWebs >= 0 then
-                self.numWebsLeft = team:GetNumDroppedGorgeStructures(player, kTechId.Web)
-            end
+				if numAllowedClogs >= 0 then
+					self.numClogsLeft = team:GetNumDroppedGorgeStructures(player, kTechId.Clog)
+				end
+				
+				if numAllowedTunnels >= 0 then
+					self.numTunnelsLeft = team:GetNumDroppedGorgeStructures(player, kTechId.GorgeTunnel)
+				end
+				
+				if numAllowedWebs >= 0 then
+					self.numWebsLeft = team:GetNumDroppedGorgeStructures(player, kTechId.Web)
+				end
 
-            if numAllowedBabblers >= 0 then
-                self.numBabblersLeft = team:GetNumDroppedGorgeStructures(player, kTechId.BabblerEgg)
-            end
-    
-            if numAllowedStructures >= 0 then
-                self.numStructuresLeft = team:GetNumDroppedGorgeStructures(player, kTechId.Whip) + team:GetNumDroppedGorgeStructures(player, kTechId.Crag) + team:GetNumDroppedGorgeStructures(player, kTechId.Shift) + team:GetNumDroppedGorgeStructures(player, kTechId.Shade)
-            end
-        end
+				if numAllowedBabblers >= 0 then
+					self.numBabblersLeft = team:GetNumDroppedGorgeStructures(player, kTechId.BabblerEgg)
+				end
+		
+				if numAllowedStructures >= 0 then
+					self.numStructuresLeft = team:GetNumDroppedGorgeStructures(player, kTechId.GorgeWhip) + team:GetNumDroppedGorgeStructures(player, kTechId.GorgeCrag) + team:GetNumDroppedGorgeStructures(player, kTechId.GorgeShift) + team:GetNumDroppedGorgeStructures(player, kTechId.GorgeShade)
+				end
+			end
 
-    end
-
+		end
+	end
+	
 end
 
 function DropStructureAbility:GetShowGhostModel()

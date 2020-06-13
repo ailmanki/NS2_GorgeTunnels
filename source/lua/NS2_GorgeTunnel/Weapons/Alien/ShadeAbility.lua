@@ -33,7 +33,7 @@ function ShadeStructureAbility:GetDropStructureId()
 end
 
 local function EntityCalculateShadeFilter(entity)
-    return function (test) return EntityFilterOneAndIsa(entity, "Clog") or test:isa("Shade") end
+    return function (test) return EntityFilterOneAndIsa(entity, "Clog") or test:isa("GorgeShade") end
 end
 
 local function CalculateShadePosition(position, player, normal)
@@ -42,7 +42,7 @@ local function CalculateShadePosition(position, player, normal)
 
 	local valid = true
     if valid then
-        local extents = GetExtents(kTechId.Shade) / 2.25
+        local extents = GetExtents(kTechId.GorgeShade) / 2.25
         local traceStart = position + normal * 0.15 -- A bit above to allow shades to be placed on uneven ground easily
         local traceEnd = position + normal * extents.y
         local trace = Shared.TraceBox(extents, traceStart, traceEnd, CollisionRep.Damage, PhysicsMask.Bullets, EntityCalculateShadeFilter(player))
@@ -66,13 +66,13 @@ function ShadeStructureAbility:GetIsPositionValid(position, player, surfaceNorma
 end
 
 function ShadeStructureAbility:GetSuffixName()
-    return "shade"
+    return "gorgeshade"
 end
 
 function ShadeStructureAbility:GetDropClassName()
-    return "Shade"
+    return "GorgeShade"
 end
 
 function ShadeStructureAbility:GetDropMapName()
-    return Shade.kMapName
+    return GorgeShade.kMapName
 end

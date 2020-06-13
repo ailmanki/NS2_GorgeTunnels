@@ -19,4 +19,7 @@ ModLoader.SetupFileHook( "lua/Weapons/Alien/DropStructureAbility.lua", "lua/NS2_
 --ModLoader.SetupFileHook( "lua/DigestMixin.lua", 		"lua/NS2_GorgeTunnel/DigestMixin.lua", "post" )
 
 -- Allows Gorge Tunnel in Combat
-ModLoader.SetupFileHook( "lua/Combat/Globals.lua", 		"lua/NS2_GorgeTunnel/BalanceCombat.lua", "post" )
+ModLoader.SetupFileHook( "lua/Combat/Globals.lua","lua/NS2_GorgeTunnel/BalanceCombat.lua", "post" )
+-- Make Gorge Toys a target for arcs in combat
+ModLoader.SetupFileHook( "lua/Combat/FileHooks/Post/ARC.lua","lua/NS2_GorgeTunnel/Combat/FileHooks/Post/ARC.lua", "replace" )
+

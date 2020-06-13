@@ -13,4 +13,6 @@ kGorgeShiftCostKill = 1
 kGorgeShadeCost = 1
 kGorgeShadeCostDigest = 1
 kGorgeShadeCostKill = 1
+
+kARCRangeDetection = kARCRange * 1.2
 -- kGorgeTunnelBuildTime = 18.5

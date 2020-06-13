@@ -1,13 +1,14 @@
 name        = "Gorge Toys"
 source_dir  = "source"
 output_dir  = "output"
-description = [=[Brings toys for the Gorge!
-
-Gorge can now not only drop a tunnel, but also whips, crags, shifts and shade.
-
-Includes [url=steamcommunity.com/sharedfiles/filedetails/?id=2057535828] Gorge Tunnel [/url] !
-
-
+description = [=[Brings toys for the Gorge!
+
+Gorge can now not only drop a tunnel, but also whips, crags, shifts and shade.
+
+Includes [url=steamcommunity.com/sharedfiles/filedetails/?id=2057535828] Gorge Tunnel [/url] !
+
+
+
 ModID: 7B9B0165]=]
 image       = "preview.jpg"
 tag_modtype = "Gameplay Tweak"

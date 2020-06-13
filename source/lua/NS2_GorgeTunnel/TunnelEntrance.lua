@@ -820,7 +820,7 @@ if Server then
         self:AddTimedCallback(TunnelEntrance.UpdateDestruction, kUpdateDestructionInterval)
       
         if self:GetGorgeOwner() then
-            player = self:GetOwner()
+            local player = self:GetOwner()
             if player then
                 if (self.consumed) then
                     player:AddResources(kGorgeTunnelCostDigest)

@@ -12,8 +12,8 @@ if Server then
 	local function findTarget(targets, arcOrigin, targetSearching, distToTarget, target)
 		if targetSearching then
 			for _, enemy in ipairs (targets) do
-				if enemy:GetIsAlive() then
-					local distToTargetSub = (enemy:GetOrigin() - arcOrigin):GetLength()
+				if enemy:GetIsAlive() and (enemy:GetIsSighted() or GetIsTargetDetected(enemy)) then
+					local distToTargetSub = (enemy:GetOrigin() - arcOrigin):GetLengthXZ()
 					if (distToTargetSub < distToTarget) then
 						target = enemy
 						distToTarget = distToTargetSub
@@ -39,19 +39,28 @@ if Server then
 			local teamNumber = GetEnemyTeamNumber(self:GetTeamNumber())
 			local arcOrigin = self:GetOrigin()
 			
-			-- drive to CC, if on the way gorge structures appear, target them
-			-- prio: shade, crag, entrance, whip unless cc is nearer
+
+			-- prio: hive, shade, crag, entrance, whip
 			
 			local enemyCCs = GetEntitiesForTeam("CommandStructure", teamNumber)
 			
 			
 			local distToTarget = math.huge
 			local target
-			local targetSearching = true
 			
-			-- find nearest cc
-			targetSearching, distToTarget, target =  findTarget(enemyCCs, arcOrigin, targetSearching, distToTarget, target)
-			targetSearching = true
+			-- find nearest hive
+			for _, enemy in ipairs (enemyCCs) do
+				if enemy:GetIsAlive() then
+					local distToTargetSub = (enemy:GetOrigin() - arcOrigin):GetLengthXZ()
+					if (distToTargetSub < distToTarget) then
+						target = enemy
+						distToTarget = distToTargetSub
+						break
+					end
+				end
+			end
+			
+			local targetSearching = true
 			
 			-- find nearest shade
 			local enemyGSs = GetEntitiesForTeam("GorgeShade", teamNumber, arcOrigin, kARCRangeDetection)
@@ -79,7 +88,7 @@ if Server then
 				if self.deployMode == ARC.kDeployMode.Undeployed then
 					self:GiveOrder(kTechId.ARCDeploy, self:GetId(), arcOrigin, nil, true, true)
 				end
-			elseif self:GetCurrentOrder() == nil or self:GetCurrentOrder():GetType() ~= kTechId.Move then
+			else -- if self:GetCurrentOrder() == nil or self:GetCurrentOrder():GetType() ~= kTechId.Move then
 				if self.deployMode == ARC.kDeployMode.Undeployed then
 					if target then
 						self:GiveOrder(kTechId.Move, target:GetId(), target:GetOrigin(), nil, true, true)

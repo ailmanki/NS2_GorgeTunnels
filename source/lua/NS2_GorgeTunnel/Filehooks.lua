@@ -22,4 +22,6 @@ ModLoader.SetupFileHook( "lua/Weapons/Alien/DropStructureAbility.lua", "lua/NS2_
 ModLoader.SetupFileHook( "lua/Combat/Globals.lua","lua/NS2_GorgeTunnel/BalanceCombat.lua", "post" )
 -- Make Gorge Toys a target for arcs in combat
 ModLoader.SetupFileHook( "lua/Combat/FileHooks/Post/ARC.lua","lua/NS2_GorgeTunnel/Combat/FileHooks/Post/ARC.lua", "replace" )
+-- On certain "reset" event destroy gorge structures from the player
+ModLoader.SetupFileHook( "lua/Combat/Player_Upgrades.lua","lua/NS2_GorgeTunnel/Combat/Player_Upgrades.lua", "post" )
 

@@ -27,7 +27,7 @@ DropStructureAbility.kMapName = "drop_structure_ability"
 PrecacheAsset("sound/NS2.fev/alien/gorge/create_fail")
 local kAnimationGraph = PrecacheAsset("models/alien/gorge/gorge_view.animation_graph")
 
-DropStructureAbility.kSupportedStructures = { HydraStructureAbility, ClogAbility, WebsAbility, GorgeTunnelAbility, BabblerEggAbility, WhipStructureAbility, CragStructureAbility, ShadeStructureAbility, ShiftStructureAbility  }
+DropStructureAbility.kSupportedStructures = { HydraStructureAbility, ClogAbility, WebsAbility, BabblerEggAbility, GorgeTunnelAbility, WhipStructureAbility, CragStructureAbility, ShadeStructureAbility, ShiftStructureAbility  }
 
 local networkVars =
 {

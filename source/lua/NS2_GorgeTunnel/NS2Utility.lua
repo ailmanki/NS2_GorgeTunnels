@@ -1358,12 +1358,11 @@ function GetPowerPointForLocation(locationName)
     end
 
     local locationId = Shared.GetStringIndex(locationName)
-
     local powerPoints = Shared.GetEntitiesWithClassname("PowerPoint")
     for _, powerPoint in ientitylist(powerPoints) do
-            if powerPoint:GetLocationId() == locationId then
-                return powerPoint
-            end
+        if powerPoint:GetLocationId() == locationId then
+            return powerPoint
+        end
     end
 
     return nil
@@ -1439,7 +1438,7 @@ function GetReflectionProbesForLocation(locationName)
     local locationTransforms = Client.locationList[locationName]
 
     for _, locationTransform in ipairs(locationTransforms) do
-
+        
         if Client.reflectionProbeList then
             for _, probe in ipairs(Client.reflectionProbeList) do
 
@@ -1462,7 +1461,7 @@ function GetReflectionProbesForLocation(locationName)
         end
 
     end
-
+    
     probeLocationCache[locationName] = probeList
 
     return probeList
@@ -3163,12 +3162,12 @@ function ValidateVariant( variants, variantType, enum, enumData )
     if not rawget( enum, idx ) then -- if it's an invalid id
         Client.SetOptionInteger(variantType, 1) -- fix it
         idx = 1
-        HPrint( "Invalid ID on "..variantType )
+        HPrint( "Invalid ID on " .. variantType )
     elseif not GetHasVariant( enumData, idx ) then -- if they don't have access to this
         idx = 1 -- don't let them use it
         HPrint( "No access to " .. variantType .. " " .. pvIdx )
     end
-
+    
     variants[variantType] = idx
 end
 

@@ -1085,6 +1085,7 @@ function BuildTechData()
 
         {
             [kTechDataId] = kTechId.ARCRoboticsFactory,
+            [kTechDataUpgradeTech] = kTechId.RoboticsFactory,
             [kTechDataCostKey] = kRoboticsFactoryCost + kUpgradeRoboticsFactoryCost,
             [kTechDataSupply] = kRoboticsFactorySupply,
             [kTechDataHint] = "ARC_ROBOTICS_FACTORY_HINT",
@@ -1464,7 +1465,7 @@ function BuildTechData()
         {
             [kTechDataId] = kTechId.DropShotgun,
             [kTechDataMapName] = Shotgun.kMapName,
-            [kTechDataDisplayName] = "SHOTGUN",
+            [kTechDataDisplayName] = "SHOTGUN_DROP",
             [kTechIDShowEnables] = false,
             [kTechDataTooltipInfo] = "SHOTGUN_TOOLTIP",
             [kTechDataModel] = Shotgun.kModelName,
@@ -1477,7 +1478,7 @@ function BuildTechData()
         {
             [kTechDataId] = kTechId.DropHeavyMachineGun,
             [kTechDataMapName] = HeavyMachineGun.kMapName,
-            [kTechDataDisplayName] = "HEAVY_MACHINE_GUN",
+            [kTechDataDisplayName] = "HEAVY_MACHINE_GUN_DROP",
             [kTechIDShowEnables] = false,
             [kTechDataTooltipInfo] = "HEAVY_MACHINE_GUN_TOOLTIP",
             [kTechDataModel] = HeavyMachineGun.kModelName,
@@ -1490,7 +1491,7 @@ function BuildTechData()
         {
             [kTechDataId] = kTechId.DropWelder,
             [kTechDataMapName] = Welder.kMapName,
-            [kTechDataDisplayName] = "WELDER",
+            [kTechDataDisplayName] = "WELDER_DROP",
             [kTechIDShowEnables] = false,
             [kTechDataTooltipInfo] = "WELDER_TOOLTIP",
             [kTechDataModel] = Welder.kModelName,
@@ -1503,7 +1504,7 @@ function BuildTechData()
         {
             [kTechDataId] = kTechId.DropMines,
             [kTechDataMapName] = LayMines.kMapName,
-            [kTechDataDisplayName] = "MINE",
+            [kTechDataDisplayName] = "MINE_DROP",
             [kTechIDShowEnables] = false,
             [kTechDataTooltipInfo] = "MINE_TOOLTIP",
             [kTechDataModel] = LayMines.kDropModelName,
@@ -1517,7 +1518,7 @@ function BuildTechData()
             [kTechDataId] = kTechId.DropGrenadeLauncher,
             [kTechDataMapName] = GrenadeLauncher.kMapName,
             [kTechIDShowEnables] = false,
-            [kTechDataDisplayName] = "GRENADE_LAUNCHER",
+            [kTechDataDisplayName] = "GRENADE_LAUNCHER_DROP",
             [kTechDataTooltipInfo] = "GRENADE_LAUNCHER_TOOLTIP",
             [kTechDataModel] = GrenadeLauncher.kModelName,
             [kTechDataCostKey] = kGrenadeLauncherDropCost,
@@ -1529,7 +1530,7 @@ function BuildTechData()
         {
             [kTechDataId] = kTechId.DropFlamethrower,
             [kTechDataMapName] = Flamethrower.kMapName,
-            [kTechDataDisplayName] = "FLAMETHROWER",
+            [kTechDataDisplayName] = "FLAMETHROWER_DROP",
             [kTechIDShowEnables] = false,
             [kTechDataTooltipInfo] = "FLAMETHROWER_TOOLTIP",
             [kTechDataModel] = Flamethrower.kModelName,
@@ -1542,7 +1543,7 @@ function BuildTechData()
         {
             [kTechDataId] = kTechId.DropJetpack,
             [kTechDataMapName] = Jetpack.kMapName,
-            [kTechDataDisplayName] = "JETPACK",
+            [kTechDataDisplayName] = "JETPACK_DROP",
             [kTechIDShowEnables] = false,
             [kTechDataTooltipInfo] = "JETPACK_TOOLTIP",
             [kTechDataModel] = Jetpack.kModelName,
@@ -2554,7 +2555,7 @@ function BuildTechData()
             [kTechDataTooltipInfo] = "CRAG_TOOLTIP",
             [kTechDataGrows] = true,
         },
-    
+
         -- Upgrade structures and research
         {
             [kTechDataId] = kTechId.GorgeCrag,
@@ -3102,7 +3103,7 @@ function BuildTechData()
         },
         
         -- Tunnel tech
-        
+
         -- Initial tunnel entrance placement for a new tunnel.
         {
             [kTechDataId] = kTechId.Tunnel,
@@ -3926,7 +3927,6 @@ function BuildTechData()
             [kTechDataId] = kTechId.Carapace,
             [kTechDataCategory] = kTechId.CragHive,
             [kTechDataDisplayName] = "CARAPACE",
-            [kTechDataSponitorCode] = "C",
             [kTechDataCostKey] = kCarapaceCost,
             [kTechDataTooltipInfo] = "CARAPACE_TOOLTIP",
         },
@@ -3935,7 +3935,6 @@ function BuildTechData()
             [kTechDataId] = kTechId.Regeneration,
             [kTechDataCategory] = kTechId.CragHive,
             [kTechDataDisplayName] = "REGENERATION",
-            [kTechDataSponitorCode] = "R",
             [kTechDataCostKey] = kRegenerationCost,
             [kTechDataTooltipInfo] = "REGENERATION_TOOLTIP",
         },
@@ -3944,7 +3943,6 @@ function BuildTechData()
             [kTechDataId] = kTechId.Vampirism,
             [kTechDataCategory] = kTechId.CragHive,
             [kTechDataDisplayName] = "VAMPIRISM",
-            [kTechDataSponitorCode] = "V",
             [kTechDataTooltipInfo] = "VAMPIRISM_TOOLTIP",
             [kTechDataCostKey] = kVampirismCost,
         },
@@ -3954,7 +3952,6 @@ function BuildTechData()
             [kTechDataId] = kTechId.Focus,
             [kTechDataCategory] = kTechId.ShadeHive,
             [kTechDataDisplayName] = "FOCUS",
-            [kTechDataSponitorCode] = "F",
             [kTechDataTooltipInfo] = "FOCUS_TOOLTIP",
             [kTechDataCostKey] = kFocusCost,
         },
@@ -3963,7 +3960,6 @@ function BuildTechData()
             [kTechDataId] = kTechId.Camouflage,
             [kTechDataCategory] = kTechId.ShadeHive,
             [kTechDataDisplayName] = "CAMOUFLAGE",
-            [kTechDataSponitorCode] = "M",
             [kTechDataTooltipInfo] = "CAMOUFLAGE_TOOLTIP",
             [kTechDataCostKey] = kCamouflageCost,
         },
@@ -3972,7 +3968,6 @@ function BuildTechData()
             [kTechDataId] = kTechId.Aura,
             [kTechDataCategory] = kTechId.ShadeHive,
             [kTechDataDisplayName] = "AURA",
-            [kTechDataSponitorCode] = "U",
             [kTechDataTooltipInfo] = "AURA_TOOLTIP",
             [kTechDataCostKey] = kAuraCost,
         },
@@ -3982,7 +3977,6 @@ function BuildTechData()
             [kTechDataId] = kTechId.Celerity,
             [kTechDataCategory] = kTechId.ShiftHive,
             [kTechDataDisplayName] = "CELERITY",
-            [kTechDataSponitorCode] = "L",
             [kTechDataTooltipInfo] = "CELERITY_TOOLTIP",
             [kTechDataCostKey] = kCelerityCost,
         },
@@ -3991,7 +3985,6 @@ function BuildTechData()
             [kTechDataId] = kTechId.Adrenaline,
             [kTechDataCategory] = kTechId.ShiftHive,
             [kTechDataDisplayName] = "ADRENALINE",
-            [kTechDataSponitorCode] = "A",
             [kTechDataTooltipInfo] = "ADRENALINE_TOOLTIP",
             [kTechDataCostKey] = kAdrenalineCost,
         },
@@ -4000,7 +3993,6 @@ function BuildTechData()
             [kTechDataId] = kTechId.Crush,
             [kTechDataCategory] = kTechId.ShiftHive,
             [kTechDataDisplayName] = "CRUSH",
-            [kTechDataSponitorCode] = "H",
             [kTechDataCostKey] = kCarapaceCost,
             [kTechDataTooltipInfo] = "CRUSH_TOOLTIP",
         },
@@ -4465,7 +4457,12 @@ function GetCachedTechData(techId, fieldName)
     end
     
     local entry = kCachedTechData[techId]
-    return entry and entry[fieldName]
+
+    if entry then
+        return entry[fieldName]
+    else
+        return nil
+end
 
 end
 
@@ -4496,7 +4493,7 @@ end
 -- Call with techId and fieldname (returns nil if field not found). Pass optional
 -- third parameter to use as default if not found.
 function LookupTechData(techId, fieldName, default)
-
+    
     PROFILE("LookupTechData")
     
     -- Initialize table if necessary
@@ -4512,7 +4509,8 @@ function LookupTechData(techId, fieldName, default)
         return 0
     end
 
-    return GetCachedTechData(techId, fieldName) or default
+    local retVal = GetCachedTechData(techId, fieldName)
+    return ConditionalValue(retVal ~= nil, retVal, default)
 
 end
 

@@ -58,7 +58,7 @@ function AlienTeam:AddGorgeStructure(player, structure)
         local clientId = Server.GetOwner(player):GetUserId()
         local structureId = structure:GetId()
         local techId = structure:GetTechId()
-		
+
 		--Print("techId "..techId)
 
         if not self.clientOwnedStructures[clientId] then
@@ -80,7 +80,7 @@ function AlienTeam:AddGorgeStructure(player, structure)
         ApplyGorgeStructureTheme(structure, player)
 
         local numAllowedStructure = LookupTechData(techId, kTechDataMaxAmount, -1) --* self:GetNumHives()
-		
+
 		--Print("#allowed "..numAllowedStructure.." current# "..#structureTypeTable[techId])
         if numAllowedStructure >= 0 and #structureTypeTable[techId] > numAllowedStructure then
             self:RemoveGorgeStructureFromClient(techId, clientId)
@@ -380,7 +380,7 @@ function AlienTeam:InitTechTree()
 
     -- fade researches
     self.techTree:AddResearchNode(kTechId.MetabolizeEnergy,        kTechId.BioMassThree, kTechId.None, kTechId.AllAliens)
-    self.techTree:AddResearchNode(kTechId.MetabolizeHealth,            kTechId.BioMassFour, kTechId.MetabolizeEnergy, kTechId.AllAliens)
+    self.techTree:AddResearchNode(kTechId.MetabolizeHealth,        kTechId.BioMassFive, kTechId.MetabolizeEnergy, kTechId.AllAliens)
     self.techTree:AddResearchNode(kTechId.Stab,              kTechId.BioMassSeven, kTechId.None, kTechId.AllAliens)
 
     -- onos researches

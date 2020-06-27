@@ -470,6 +470,19 @@ function TunnelEntrance:GetTechAllowed(techId)
     return allowed, canAfford
 end
 
+function TunnelEntrance:GetSendDeathMessageOverride(messageViewerTeam, killer)
+
+    -- Hide the message if it killed itself (collapse)
+    if messageViewerTeam and self == killer then
+
+        if messageViewerTeam.GetTeamType and messageViewerTeam:GetTeamType() ~= self:GetTeamType() then
+            return false
+        end
+    end
+
+    return true
+end
+
 function TunnelEntrance:PerformActivation(techId)
     
     local success = false
@@ -477,9 +490,7 @@ function TunnelEntrance:PerformActivation(techId)
     
     if techId == kTechId.TunnelCollapse then
         if self:GetCanTriggerCollapse() then
-            
-            self:Kill()
-            
+            self:Kill(self)
         end
     end
     

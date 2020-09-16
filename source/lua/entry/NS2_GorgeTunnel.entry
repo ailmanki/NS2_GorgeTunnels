@@ -1,4 +1,5 @@
 modEntry = {
+    Shared = "lua/NS2_GorgeTunnel/Shared.lua",
     FileHooks = "lua/NS2_GorgeTunnel/Filehooks.lua",
     Priority = 84 --make sure this is higher than any UWE extension
 }

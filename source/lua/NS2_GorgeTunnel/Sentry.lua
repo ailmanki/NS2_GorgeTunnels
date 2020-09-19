@@ -85,6 +85,17 @@ function Sentry:GetUnitNameOverride(viewer)
 
 end
 
+local oldonKill = Sentry.onKill
+function Sentru:onKill(killer, doer, point, direction)
+    if self.GetIsGhostStructure and self:GetIsGhostStructure() then
+        -- make it poof!
+        self:SetHealth(0)
+        self:OnTakeDamage(0)
+        return
+    end
+    oldonKill(self, killer, doer, point, direction)
+end
+
 local oldOnDestroy = Sentry.OnDestroy
 function Sentry:OnDestroy()
     if Server then
@@ -100,6 +111,13 @@ function Sentry:OnDestroy()
                 player:AddResources(1)
             end
         end
+    end
+    
+    if self.GetIsGhostStructure and self:GetIsGhostStructure() then
+        -- make it poof!
+        self:SetHealth(0)
+        self:OnTakeDamage(0)
+        return
     end
     
     oldOnDestroy(self)

@@ -13,6 +13,9 @@ kGorgeShiftCostKill = 0
 kGorgeShadeCost = 10
 kGorgeShadeCostDigest = 6
 kGorgeShadeCostKill = 0
+kGorgeShadeCloakRadius = 17
+kGorgeShadeHealth = 600
+kGorgeWhipBuildTime = kWhipBuildTime
 
 --kGorgeStructuresPerHive = 3  --not used yet
 

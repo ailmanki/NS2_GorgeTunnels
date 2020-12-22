@@ -2,6 +2,7 @@ Script.Load("lua/DigestMixin.lua")
 
 class 'GorgeShade' (Shade)
 
+GorgeShade.kCloakRadius = kGorgeShadeCloakRadius
 GorgeShade.kMapName = "gorgeshade"
 GorgeShade.kMaxUseableRange = 6.5
 local kDigestDuration = 1.5

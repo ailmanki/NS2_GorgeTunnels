@@ -438,7 +438,7 @@ function TunnelEntrance:GetTechButtons()
         buttons[1] = kTechId.TunnelExit
     end
     if self:GetCanTriggerCollapse() then
-        buttons[7] = kTechId.TunnelCollapse
+        buttons[8] = kTechId.TunnelCollapse
     end
     
     if self:GetCanRelocate() then
@@ -489,7 +489,10 @@ function TunnelEntrance:PerformActivation(techId)
     local keepProcessing = true
     
     if techId == kTechId.TunnelCollapse then
+
+        -- TODO(Salads): Replace the current icon for consumed in inventory_icons with the one in buildmenu.
         if self:GetCanTriggerCollapse() then
+            self.consumed = true
             self:Kill(self)
         end
     end

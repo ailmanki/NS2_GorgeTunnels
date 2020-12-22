@@ -59,8 +59,6 @@ function AlienTeam:AddGorgeStructure(player, structure)
         local structureId = structure:GetId()
         local techId = structure:GetTechId()
 
-		--Print("techId "..techId)
-
         if not self.clientOwnedStructures[clientId] then
             table.insert(self.clientStructuresOwner, clientId)
             self.clientOwnedStructures[clientId] = {
@@ -81,7 +79,6 @@ function AlienTeam:AddGorgeStructure(player, structure)
 
         local numAllowedStructure = LookupTechData(techId, kTechDataMaxAmount, -1) --* self:GetNumHives()
 
-		--Print("#allowed "..numAllowedStructure.." current# "..#structureTypeTable[techId])
         if numAllowedStructure >= 0 and #structureTypeTable[techId] > numAllowedStructure then
             self:RemoveGorgeStructureFromClient(techId, clientId)
         end
@@ -100,7 +97,6 @@ function AlienTeam:GetDroppedGorgeStructures(player, techId)
         local structureTypeTable = self.clientOwnedStructures[clientId]
 
         if structureTypeTable then
-			--Print(ToString(structureTypeTable))
             return structureTypeTable[techId]
         end
 

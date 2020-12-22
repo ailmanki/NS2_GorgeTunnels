@@ -221,6 +221,7 @@ local function UpdateButton(button, index)
     
     local row = GetRowForTechId(button.techId)
    
+    button.smokeyBackground:SetIsVisible(Client.GetHudDetail() ~= kHUDMode.Minimal)
     button.graphicItem:SetTexturePixelCoordinates(GUIGetSprite(col, row, GUIGorgeBuildMenu.kPixelSize, GUIGorgeBuildMenu.kPixelSize))
     button.description:SetColor(color)
     button.costIcon:SetColor(color)
@@ -329,6 +330,10 @@ function GUIGorgeBuildMenu:CreateButton(techId, scale, frame, keybind, position)
         costText = self:CreateAnimatedTextItem(),
     }
     
+    local minimal = Client.GetHudDetail() == kHUDMode.Minimal
+    local backgroundSize = ConditionalValue(minimal, Vector(0,0,0), self.kSmokeyBackgroundSize)
+    local backgroundTexCoords = ConditionalValue(minimal, {{0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}}, self.kSmokeSmallTextureCoordinates)
+
     local smokeyBackground = GetGUIManager():CreateGraphicItem()
     smokeyBackground:SetAnchor(GUIItem.Middle, GUIItem.Center)
     smokeyBackground:SetSize(self.kSmokeyBackgroundSize)
@@ -338,6 +343,7 @@ function GUIGorgeBuildMenu:CreateButton(techId, scale, frame, keybind, position)
     smokeyBackground:SetAdditionalTexture("noise", self.kBackgroundNoiseTexture)
     smokeyBackground:SetFloatParameter("correctionX", 0.6)
     smokeyBackground:SetFloatParameter("correctionY", 1)
+    smokeyBackground:SetIsVisible(not minimal)
     
     button.frame:SetUniformScale(scale)
     button.frame:SetSize(Vector(GUIGorgeBuildMenu.kButtonWidth, GUIGorgeBuildMenu.kButtonHeight, 0))
@@ -406,6 +412,7 @@ function GUIGorgeBuildMenu:CreateButton(techId, scale, frame, keybind, position)
     button.costText:SetColor(GUIGorgeBuildMenu.kAvailableColor)
     button.costIcon:AddChild(button.costText)
     
+    button.smokeyBackground = smokeyBackground
     button.background:AddChild(smokeyBackground)
     button.background:AddChild(button.graphicItem)    
     button.graphicItem:AddChild(button.description)

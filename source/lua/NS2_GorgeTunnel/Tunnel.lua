@@ -8,7 +8,6 @@
 --
 -- ========= For more information, visit us at http://www.unknownworlds.com =====================
 
---[[
 Script.Load("lua/TunnelProp.lua")
 Script.Load("lua/EntityChangeMixin.lua")
 Script.Load("lua/Mixins/ModelMixin.lua")
@@ -113,7 +112,6 @@ Tunnel.kMapName = "tunnel"
 AddMixinNetworkVars(BaseModelMixin, networkVars)
 AddMixinNetworkVars(ModelMixin, networkVars)
 AddMixinNetworkVars(TeamMixin, networkVars)
-]]
 
 -- Returns the number of non-collapsing tunnels active for the given team (assumes alien team if none specified).
 function Tunnel.GetLivingTunnelCount(teamNumber)
@@ -142,7 +140,7 @@ function Tunnel.GetLivingTunnelCount(teamNumber)
     return count
 end
 
---[[function Tunnel:OnCreate()
+function Tunnel:OnCreate()
     
     Entity.OnCreate(self)
     
@@ -206,13 +204,13 @@ local function CreateRandomTunnelProps(self)
     
     end
 
-end]]
+end
 
 function Tunnel:GetIsDeadEnd()
     return not self.exitAConnected or not self.exitBConnected
 end
 
---[[function Tunnel:OnInitialized()
+function Tunnel:OnInitialized()
     
     self:SetModel(Tunnel.kModelName, kAnimationGraph)
     
@@ -244,21 +242,21 @@ end
         self.tunnelCinematic:SetCinematic(kTunnelCinematic)
         self.tunnelCinematic:SetRepeatStyle(Cinematic.Repeat_Endless)
         self.tunnelCinematic:SetCoords(self:GetCoords())
-        ]]--[[
+        --[[
         self.tunnelReverb = Reverb()
         self.tunnelReverb:SetOrigin(self:GetOrigin())
         self.tunnelReverb.minRadius = 27
         self.tunnelReverb.maxRadius = 30
         self.tunnelReverb.reverbType = kReverbNames.hallway
         self.tunnelReverb:OnLoad()
-        --]]--[[
+        --]]
     end
     
     self.tunnelContentsActive = true
 
-end]]
+end
 
---[[function Tunnel:OnDestroy()
+function Tunnel:OnDestroy()
     
     Entity.OnDestroy(self)
     
@@ -297,15 +295,15 @@ end]]
     
     end
 
-end]]
+end
 
---[[local function GetEntitiesWithTagInTunnel(self, tag)
+local function GetEntitiesWithTagInTunnel(self, tag)
     return Shared.GetEntitiesWithTagInRange(tag, self:GetOrigin(), (kTunnelLength + 1))
-end]]
+end
 
---[[function Tunnel:GetIsCollapsing()
+function Tunnel:GetIsCollapsing()
     return self.collapsing
-end]]
+end
 
 if Server then
     
@@ -324,7 +322,7 @@ if Server then
     
     end
     
---[[    function Tunnel:GetConnectionStartPoint()
+    function Tunnel:GetConnectionStartPoint()
         
         if self.exitAConnected then
             return self.exitAEntityPosition
@@ -338,7 +336,7 @@ if Server then
             return self.exitBEntityPosition
         end
     
-    end]]
+    end
     
     function Tunnel:UpdateExit(exit)
         
@@ -351,7 +349,7 @@ if Server then
     
     end
     
---[[    local function RemoveExitIdFromTunnel(self, id)
+    local function RemoveExitIdFromTunnel(self, id)
         
         if self.exitAId == id then
             self.exitAId = Entity.invalidId
@@ -574,13 +572,13 @@ if Server then
         -- reenter the tunnel).
         self:DestroyAsSoonAsVacant()
     
-    end]]
+    end
     
     function Tunnel:TriggerCollapse()
         self.collapsing = true
     end
     
---[[    function Tunnel:StopCollapse()
+    function Tunnel:StopCollapse()
         self.collapsing = false
         self.destroyingWhenVacant = false
     end
@@ -641,7 +639,7 @@ if Server then
         
         self:UpdateActivityStatus()
     
-    end]]
+    end
     
     function Tunnel:GetOwnerClientId()
         return self.ownerClientId
@@ -651,7 +649,7 @@ if Server then
         self.ownerClientId = clientId
     end
     
---[[    function Tunnel:MovePlayerToTunnel(player, entrance)
+    function Tunnel:MovePlayerToTunnel(player, entrance)
         
         assert(player)
         assert(entrance)
@@ -684,20 +682,19 @@ if Server then
         
         end
     
-    end]]
+    end
 
 else
     -- Predict or Client
     
---[[    function Tunnel:OnUpdateRender()
+    function Tunnel:OnUpdateRender()
         
         self.tunnelLightCinematicA:SetIsVisible(self.exitAConnected)
         self.tunnelLightCinematicB:SetIsVisible(self.exitBConnected)
     
-    end]]
+    end
 
 end
---[[
 
 function Tunnel:GetExitAPosition()
     return self:GetOrigin() + self:GetCoords():TransformVector(kExitAPos)
@@ -817,4 +814,3 @@ if Server then
     end)
 
 end
-]]

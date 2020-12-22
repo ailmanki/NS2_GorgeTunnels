@@ -317,7 +317,7 @@ function DropStructureAbility:DropStructure(player, origin, direction, structure
                         angles.pitch = math.random() * math.pi * 2
                         angles.roll = math.random() * math.pi * 2
                         
-                    elseif structure:isa("GorgeTunnelEntrance") then
+                    elseif structure:isa("TunnelEntrance") then
                         angles:BuildFromCoords(coords)
                     else
                         angles:BuildFromCoords(coords)

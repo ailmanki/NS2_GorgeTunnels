@@ -10,18 +10,6 @@ function Player:Reset_Lite()
 			alienTeam:RemoveGorgeStructureFromClient(kTechId.GorgeShift, clientId)
 			alienTeam:RemoveGorgeStructureFromClient(kTechId.GorgeTunnel, clientId)
 			alienTeam:RemoveGorgeStructureFromClient(kTechId.GorgeWhip, clientId)
-			
-			local ownerId = self:GetId()
-			for _, sentry in ientitylist( Shared.GetEntitiesWithClassname("Sentry") ) do
-				Print("ownerId: " .. sentry.ownerId .. ", clientId: " .. ownerId)
-				if sentry.ownerId == ownerId then
-					if sentry:GetCanDie() then
-						sentry:Kill()
-					else
-						DestroyEntity(sentry)
-					end
-				end
-			end
 		end
 	end
 	oldPlayerReset_Lite(self)

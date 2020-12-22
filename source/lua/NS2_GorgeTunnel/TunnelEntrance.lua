@@ -74,7 +74,7 @@ local networkVars =
     skipOpenAnimation = "boolean",
     --timeResearchStarted is used to synchronize the two sides of the tunnels and their research state.
     timeResearchStarted = "time",
-    variant = "enum kGorgeVariant"
+    variant = "enum kGorgeVariants"
 }
 
 AddMixinNetworkVars(BaseModelMixin, networkVars)
@@ -148,7 +148,7 @@ function TunnelEntrance:OnCreate()
     self.otherEntranceId = Entity.invalidId
     self.clogNearMouth = false
     self.timeResearchStarted = 0
-    self.variant = kGorgeVariant.normal
+    self.variant = kGorgeVariants.normal
     
 end
 
@@ -986,7 +986,7 @@ function TunnelEntrance:OnUpdateRender()
     end
 
    -- if self._renderModel then
-   --     if self.variant == kGorgeVariant.toxin then
+   --     if self.variant == kGorgeVariants.toxin then
    --         self._renderModel:SetMaterialParameter("textureIndex", 1 )
    --     else
    --        self._renderModel:SetMaterialParameter("textureIndex", 0 )

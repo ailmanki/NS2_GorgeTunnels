@@ -24,7 +24,7 @@ function GorgeTunnelAbility:GetGhostModelName(ability)
     if player and player:isa("Gorge") then
     
         local variant = player:GetVariant()
-        if variant == kGorgeVariant.shadow then
+        if variant == kGorgeVariants.shadow then
             return TunnelEntrance.kModelNameShadow
         end
         

@@ -1,5 +1,5 @@
 kGorgeTunnelCost = 3
-kGorgeTunnelCostDigest = 3
+kGorgeTunnelCostDigest = 2
 kGorgeTunnelCostKill = 0
 kGorgeTunnelBuildTime = 12 --18.5
 kGorgeWhipCost = 10

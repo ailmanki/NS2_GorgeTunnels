@@ -131,7 +131,7 @@ function Tunnel.GetLivingTunnelCount(teamNumber)
             local otherEntrance = entrance:GetOtherEntrance()
             if otherEntrance and not markedEntrances[otherEntrance:GetId()] then
                 markedEntrances[entrance:GetId()] = true
-            
+                
                 count = count + 1
             end
         end
@@ -354,9 +354,11 @@ if Server then
         if self.exitAId == id then
             self.exitAId = Entity.invalidId
             self.exitAConnected = false
+            --Print("A%s B%s removed %s",ToString(self.exitAId),ToString(self.exitBId),ToString(id))
         elseif self.exitBId == id then
             self.exitBId = Entity.invalidId
             self.exitBConnected = false
+            --Print("A%s B%s removed %s",ToString(self.exitAId),ToString(self.exitBId),ToString(id))
         else
             return false
         end
